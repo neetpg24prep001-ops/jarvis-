@@ -1,0 +1,1287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1e3a5f">
+<title>Jarvis 30-Day</title>
+<link rel="manifest" href="manifest.json">
+<!-- React + Babel from CDN — no build step needed -->
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  MIGRATION SYSTEM
+//  ─────────────────────────────────────────────────────────────────────────
+//  HOW IT WORKS:
+//  - Every save uses key "jarvis-master" (never changes)
+//  - Data is versioned. When you add features, bump APP_VERSION.
+//  - migrate() reads whatever old shape the data is in and returns the
+//    current shape — merging, never deleting existing entries.
+//  - This means adding subjects / habits / features never loses old data.
+//
+//  TO ADD A NEW FEATURE IN FUTURE:
+//  1. Bump APP_VERSION by 1
+//  2. Add a migration step in migrate() for that version
+//  3. Add your new feature to the app
+//  Old data is preserved automatically.
+// ═══════════════════════════════════════════════════════════════════════════
+const APP_VERSION = 2;
+const STORAGE_KEY = "jarvis-master"; // NEVER change this key
+
+function migrate(raw) {
+  if (!raw) return freshState();
+
+  let data = typeof raw === "string" ? JSON.parse(raw) : raw;
+
+  // v0 → v1: wrap legacy flat structure into versioned envelope
+  if (!data.version) {
+    data = {
+      version: 1,
+      days:  data.days  || data.dayData || {},
+      revs:  data.revs  || data.entries || [],
+      nid:   data.nid   || data.nextId  || 1,
+      rvws:  data.rvws  || data.reviews || {},
+    };
+  }
+
+  // v1 → v2: subjects stored on rev entries used short keys;
+  //          map old short keys to new full names just in case
+  if (data.version < 2) {
+    const subjectMap = {
+      "Physio":"Physiology", "Pharma":"Pharmacology", "Patho":"Pathology",
+      "Med":"Medicine", "Biochem":"Biochemistry", "Micro":"Microbiology",
+    };
+    data.revs = (data.revs || []).map(e => ({
+      ...e,
+      subject: subjectMap[e.subject] || e.subject || "Other",
+    }));
+    data.version = 2;
+  }
+
+  // Always forward-fill missing fields so new features work on old data
+  return {
+    version: APP_VERSION,
+    days: data.days  || {},
+    revs: data.revs  || [],
+    nid:  data.nid   || 1,
+    rvws: data.rvws  || {},
+  };
+}
+
+function freshState() {
+  return { version: APP_VERSION, days: {}, revs: [], nid: 1, rvws: {} };
+}
+
+async function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return migrate(raw);
+  } catch { return freshState(); }
+}
+
+async function saveData(state) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...state, version: APP_VERSION }));
+  } catch {}
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  CONSTANTS — add new subjects/habits HERE, old data auto-survives
+// ═══════════════════════════════════════════════════════════════════════════
+const START = new Date(2026, 3, 1);
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const WDAYS  = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+
+// ── Subjects for 1·4·7 tracker ──────────────────────────────────────────
+// TO ADD A SUBJECT: just add a new entry here. Existing rev entries are safe.
+const SUBJECTS = {
+  "Physiology":    { color:"#f43f5e", em:"🫀" },
+  "Pharmacology":  { color:"#8b5cf6", em:"⚗️" },
+  "Pathology":     { color:"#334155", em:"🔬" },
+  "Medicine":      { color:"#0ea5e9", em:"⚕️" },
+  "PSM":           { color:"#10b981", em:"📊" },
+  "Biochemistry":  { color:"#f59e0b", em:"🧬" },
+  "Microbiology":  { color:"#84cc16", em:"🦠" },
+  "Anatomy":       { color:"#e11d48", em:"🦴" },
+  "FMT":           { color:"#0891b2", em:"⚖️" },
+  "Ophthalmology": { color:"#f97316", em:"👁️" },
+  "ENT":           { color:"#7c3aed", em:"👂" },
+  "Dermatology":   { color:"#db2777", em:"🧴" },
+  "Anaesthesia":   { color:"#64748b", em:"💉" },
+  "Radiology":     { color:"#0284c7", em:"🔭" },
+  "Psychiatry":    { color:"#9333ea", em:"🧠" },
+  "Orthopaedics":  { color:"#b45309", em:"🦿" },
+  "Paediatrics":   { color:"#16a34a", em:"👶" },
+  "OBG":           { color:"#be185d", em:"🌸" },
+  "Surgery":       { color:"#dc2626", em:"🔪" },
+  "Other":         { color:"#6b7280", em:"📚" },
+};
+
+// ── Ranks ─────────────────────────────────────────────────────────────────
+const RANKS = [
+  { name:"East Blue Rookie",  min:0,    bounty:"0",    emoji:"📖" },
+  { name:"Pirate",            min:200,  bounty:"10M",  emoji:"🏴‍☠️" },
+  { name:"Super Rookie",      min:500,  bounty:"50M",  emoji:"⚡" },
+  { name:"Grand Line Capt",   min:900,  bounty:"150M", emoji:"🔥" },
+  { name:"New World Pirate",  min:1400, bounty:"500M", emoji:"💪" },
+  { name:"Yonko Commander",   min:2000, bounty:"1B",   emoji:"👑" },
+  { name:"PIRATE KING",       min:2800, bounty:"∞",    emoji:"🏆" },
+];
+
+// ── XP values — add new habit XP here without touching old data ────────────
+const XP_VALUES = {
+  water500:10, yoga:20, posture:10, workout:30,
+  "left-8am":20, "study-ontime":25,
+  water3l:10, nojunk:15, nosugar:15, protein:10,
+  skincare:5, sunscreen:5, sleep1130:15,
+  noscreen_am:20, noscreen_pm:15, journaled:20,
+};
+
+// ── Crew ───────────────────────────────────────────────────────────────────
+const CREW = [
+  { name:"Zoro",   emoji:"⚔️",  xp:0,    color:"#22c55e", role:"First Mate"  },
+  { name:"Nami",   emoji:"🌊",  xp:200,  color:"#f59e0b", role:"Navigator"   },
+  { name:"Usopp",  emoji:"🎯",  xp:500,  color:"#84cc16", role:"Sniper"      },
+  { name:"Sanji",  emoji:"🦵",  xp:900,  color:"#eab308", role:"Cook"        },
+  { name:"Chopper",emoji:"🦌",  xp:1400, color:"#f43f5e", role:"Doctor"      },
+  { name:"Robin",  emoji:"🌸",  xp:2000, color:"#8b5cf6", role:"Historian"   },
+  { name:"Franky", emoji:"🤖",  xp:2800, color:"#3b82f6", role:"Shipwright"  },
+];
+
+// ── ALL habit keys (used to compute daily score) ──────────────────────────
+// TO ADD A NEW HABIT: add its key here + add its CheckItem in TodayPage
+const ALL_HABITS = [
+  "water500","yoga","posture","workout","left-8am","study-ontime",
+  "water3l","nojunk","nosugar","protein","skincare","sunscreen",
+  "sleep1130","noscreen_am","noscreen_pm","journaled",
+];
+
+// ── Tab definitions ────────────────────────────────────────────────────────
+const TAB_IDS = ["today","tracker","rev","review","log"];
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════════════════════════════════
+function today()          { const d = new Date(); d.setHours(0,0,0,0); return d; }
+function addDays(d, n)    { const r = new Date(d); r.setDate(r.getDate()+n); return r; }
+function dkey(d)          { return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; }
+function dayNum(d)        { return Math.round((d - START) / 86400000); }
+function isWorkoutDay(d)  { return [2,4,6].includes(d.getDay()); }
+function fmtDate(d)       { return `${WDAYS[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]}`; }
+function fmtShort(d)      { return `${d.getDate()} ${MONTHS[d.getMonth()]}`; }
+function fromKey(k)       { const [y,m,d] = k.split("-").map(Number); return new Date(y,m,d); }
+function getRank(xp)      { for (let i=RANKS.length-1;i>=0;i--) if(xp>=RANKS[i].min) return RANKS[i]; return RANKS[0]; }
+function getNextRank(xp)  { return RANKS.find(r => r.min > xp) || null; }
+
+function calcXP(days, revs) {
+  let xp = 0;
+  Object.values(days).forEach(dd =>
+    Object.entries(dd?.checks||{}).forEach(([k,v]) => { if(v && XP_VALUES[k]) xp += XP_VALUES[k]; })
+  );
+  (revs||[]).forEach(e => {
+    if (e.d1done) xp += 20;
+    if (e.d4done) xp += 30;
+    if (e.d7done) xp += 50;
+  });
+  return xp;
+}
+
+function getScore(dd) {
+  const done = ALL_HABITS.filter(k => dd?.checks?.[k]).length;
+  return { done, total: ALL_HABITS.length, pct: Math.round(done / ALL_HABITS.length * 100) };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  STYLES
+// ═══════════════════════════════════════════════════════════════════════════
+const STYLES = `
+@import url('https://fonts.googleapis.com/css2?family=Pirata+One&family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#fef9f0;--card:#fff;--card2:#fdf5e6;--border:#f0d9a0;
+  --ink:#1a0a00;--muted:#8b6914;
+  --red:#dc2626;--gold:#d97706;--navy:#1e3a5f;
+  --blue:#3b82f6;--purple:#7c3aed;--orange:#ea580c;
+  --green:#059669;--teal:#0f766e;--hk:#f97316;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:14px}
+.app{display:flex;flex-direction:column;height:100vh;max-width:500px;margin:0 auto;overflow:hidden}
+
+/* ── Header ── */
+.hdr{background:var(--navy);border-bottom:3px solid #ffd700;padding:10px 14px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.hdr-title{font-family:'Pirata One',serif;font-size:18px;color:#ffd700;line-height:1}
+.hdr-sub{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;margin-top:2px}
+.hdr-badge{background:#0f2540;border:1.5px solid #ffd700;border-radius:5px;padding:4px 10px;text-align:center}
+.hdr-badge-label{font-size:7px;letter-spacing:.15em;text-transform:uppercase;color:#94a3b8}
+.hdr-badge-val{font-family:'Pirata One',serif;font-size:13px;color:#ffd700;line-height:1}
+
+/* ── Tabs ── */
+.tabs{background:var(--card);border-bottom:2px solid var(--border);display:flex;overflow-x:auto;flex-shrink:0;scrollbar-width:none;position:relative}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:10px 13px;border:none;background:none;cursor:pointer;white-space:nowrap;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);position:relative;flex-shrink:0;font-family:'DM Sans',sans-serif;transition:color .15s}
+.tab.active{color:var(--red);font-weight:600}
+.tab.active::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:2px;background:var(--red)}
+
+/* ── Swipe container ── */
+.swipe-container{flex:1;overflow:hidden;position:relative}
+.swipe-track{display:flex;height:100%;transition:transform .3s cubic-bezier(.4,0,.2,1);will-change:transform}
+.swipe-page{flex:0 0 100%;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.swipe-page::-webkit-scrollbar{width:2px}
+.swipe-page::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.pad{padding:14px}
+
+/* ── Section label ── */
+.sec-label{font-size:9px;letter-spacing:.22em;text-transform:uppercase;margin:14px 0 8px}
+.sec-label:first-child{margin-top:0}
+
+/* ── Theme headers ── */
+.th{border-radius:8px;padding:12px 14px;margin-bottom:10px}
+.th.op{background:linear-gradient(135deg,#1e3a5f,#0f2540);border:2px solid #ffd700;color:#fff}
+.th.sl{background:linear-gradient(135deg,#0f172a,#1e1b4b);border:2px solid #3b82f6;color:#fff}
+.th.na{background:linear-gradient(135deg,#991b1b,#7c2d12);border:2px solid #ea580c;color:#fff}
+.th.hk{background:linear-gradient(135deg,#1d4ed8,#1e3a8a);border:2px solid #f97316;color:#fff}
+.th.gr{background:linear-gradient(135deg,#064e3b,#065f46);border:2px solid #059669;color:#fff}
+.th.dt{background:linear-gradient(135deg,#4c1d95,#2d1b69);border:2px solid #7c3aed;color:#fff}
+.th-title{font-family:'Pirata One',serif;font-size:18px;line-height:1;margin-bottom:3px}
+.th-sub{font-size:10px;opacity:.85;line-height:1.4}
+
+/* ── Stats ── */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:10px}
+.stat-cell{background:var(--navy);border:2px solid #ffd700;border-radius:7px;padding:11px 8px;text-align:center}
+.stat-val{font-family:'Pirata One',serif;font-size:21px;color:#ffd700;line-height:1;margin-bottom:2px}
+.stat-lbl{font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:#94a3b8}
+
+/* ── Date nav ── */
+.date-nav{background:var(--navy);border:2px solid #ffd700;border-radius:7px;padding:9px 13px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.date-nav-btn{background:none;border:1.5px solid #ffd700;border-radius:4px;color:#ffd700;padding:5px 11px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif}
+.date-nav-btn:disabled{opacity:.25;cursor:default}
+.date-nav-center{text-align:center}
+.date-nav-label{font-family:'Pirata One',serif;font-size:14px;color:#ffd700}
+.date-nav-sub{font-size:9px;color:#94a3b8;margin-top:1px}
+
+/* ── Section cards ── */
+.section-card{background:var(--card);border:2px solid var(--border);border-radius:8px;padding:12px;margin-bottom:7px}
+.section-card.op{border-top:3px solid var(--red)}
+.section-card.sl{border-top:3px solid var(--blue)}
+.section-card.na{border-top:3px solid var(--orange)}
+.section-card.hk{border-top:3px solid var(--hk)}
+.section-card.gr{border-top:3px solid var(--green)}
+.section-card.dt{border-top:3px solid var(--purple)}
+.section-title{font-family:'Pirata One',serif;font-size:14px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.prog-mini{flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.prog-mini-fill{height:100%;border-radius:2px;transition:width .4s}
+
+/* ── Checklist ── */
+.ci{display:flex;align-items:center;gap:9px;padding:9px 10px;margin-bottom:3px;background:var(--card2);border-radius:6px;cursor:pointer;user-select:none;-webkit-user-select:none;transition:background .1s}
+.ci.done{background:#f0fdf4}
+.ci.done .ci-text{color:#86efac;text-decoration:line-through}
+.ci-box{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--border);background:white;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;transition:all .15s}
+.ci.done .ci-box{background:#22c55e;border-color:#22c55e;color:white}
+.ci-text{font-size:13px;color:var(--ink);flex:1;line-height:1.3}
+.ci-xp{font-size:9px;color:var(--gold);font-weight:700;white-space:nowrap}
+
+/* ── Inputs ── */
+.notes-inp{width:100%;background:var(--card2);border:1.5px solid var(--border);border-radius:6px;padding:8px 10px;color:var(--ink);font-family:'DM Sans',sans-serif;font-size:12px;resize:none;outline:none;margin-top:6px}
+.notes-inp:focus{border-color:var(--gold)}
+.study-row{display:flex;align-items:center;gap:7px;padding:7px 10px;background:var(--card2);border-radius:6px;margin-bottom:3px}
+.study-label{font-size:12px;color:var(--ink);flex:1}
+.study-input{background:white;border:1.5px solid var(--border);border-radius:5px;padding:4px 8px;color:var(--ink);font-size:12px;width:110px;outline:none;text-align:center;font-family:'DM Sans',sans-serif}
+.study-input:focus{border-color:var(--red)}
+
+/* ── Mood ── */
+.mood-row{display:flex;align-items:center;gap:9px;padding:8px 10px;background:var(--card2);border-radius:6px;margin-bottom:3px}
+.mood-label{font-size:12px;color:var(--ink);width:76px;flex-shrink:0}
+.mood-val{font-family:'Pirata One',serif;font-size:15px;width:32px;text-align:center;flex-shrink:0}
+input[type="range"]{flex:1;height:4px}
+
+/* ── Score box ── */
+.score-box{background:var(--navy);border:2px solid #ffd700;border-radius:8px;padding:14px;text-align:center;margin-bottom:7px}
+.score-pct{font-family:'Pirata One',serif;font-size:38px;color:#ffd700;line-height:1;margin-bottom:4px}
+.score-sub{font-size:11px;color:#94a3b8}
+.score-bar{height:7px;background:#2d3748;border-radius:4px;margin-top:10px;overflow:hidden}
+.score-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--red),#ffd700);transition:width .5s}
+
+/* ── 30-day grid ── */
+.grid-30{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;margin:8px 0}
+.gc{aspect-ratio:1;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:9px;font-weight:700;cursor:pointer;font-family:'Syne',sans-serif;border:1.5px solid transparent;transition:transform .1s}
+.gc:active{transform:scale(.9)}
+.gc.gc-today{background:var(--red);color:white;border-color:#991b1b}
+.gc.gc-full{background:#22c55e;color:white;border-color:#16a34a}
+.gc.gc-partial{background:#fef3c7;color:var(--gold);border-color:var(--gold)}
+.gc.gc-missed{background:#fef2f2;color:#fca5a5;border-color:#fca5a5}
+.gc.gc-future{background:#f5f5f0;color:#d4c4a0;cursor:default}
+.gc-score{font-size:7px;opacity:.8}
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:7px}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)}
+.legend-dot{width:10px;height:10px;border-radius:2px}
+
+/* ── Habit bars ── */
+.habit-bar-row{margin-bottom:7px}
+.habit-bar-top{display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px}
+.habit-bar-track{height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.habit-bar-fill{height:100%;border-radius:2px;transition:width .4s}
+
+/* ── Wanted poster ── */
+.wanted{background:var(--card2);border:2.5px solid #ffd700;border-radius:10px;padding:14px;margin-bottom:10px;text-align:center;box-shadow:3px 3px 0 var(--gold)}
+.wanted-tag{font-family:'Pirata One',serif;font-size:10px;letter-spacing:.3em;color:var(--muted)}
+.wanted-emoji{font-size:50px;margin:6px 0;line-height:1;display:block}
+.wanted-rank{font-family:'Pirata One',serif;font-size:18px;color:var(--red);margin-bottom:2px}
+.wanted-bounty{font-family:'Pirata One',serif;font-size:30px;color:var(--navy);line-height:1}
+.wanted-berry{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.xp-wrap{margin-top:8px}
+.xp-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:4px}
+.xp-track{height:7px;background:#f0d9a0;border-radius:4px;overflow:hidden;border:1px solid var(--gold)}
+.xp-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--red),#ffd700);transition:width .5s}
+
+/* ── Crew ── */
+.crew-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:5px;margin-bottom:10px}
+.crew-card{background:var(--card);border:2px solid var(--border);border-radius:8px;padding:10px;text-align:center}
+.crew-card.locked{opacity:.35;filter:grayscale(1)}
+.crew-emoji{font-size:24px;line-height:1;margin-bottom:4px}
+.crew-name{font-family:'Pirata One',serif;font-size:14px;margin-bottom:1px}
+.crew-role{font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+/* ── Revision ── */
+.rev-form{background:var(--card);border:2px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px}
+.rev-title{font-family:'Pirata One',serif;font-size:15px;color:var(--red);margin-bottom:10px}
+.filter-grid{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
+.filter-btn{padding:4px 10px;border-radius:20px;border:1.5px solid var(--border);background:none;color:var(--muted);font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s}
+.filter-btn.active{color:white;border-color:transparent}
+.date-inp{flex:1;background:var(--card2);border:1.5px solid var(--border);border-radius:5px;padding:7px 9px;color:var(--ink);font-size:12px;outline:none;font-family:'DM Sans',sans-serif}
+.date-inp:focus{border-color:var(--gold)}
+.text-inp{width:100%;background:var(--card2);border:1.5px solid var(--border);border-radius:6px;padding:9px 12px;color:var(--ink);font-size:13px;outline:none;margin-bottom:8px;font-family:'DM Sans',sans-serif}
+.text-inp:focus{border-color:var(--red)}
+.add-btn{width:100%;padding:11px;border:none;border-radius:6px;background:var(--red);color:white;font-family:'Pirata One',serif;font-size:15px;cursor:pointer}
+.add-btn:disabled{opacity:.4;cursor:default}
+.rev-entry{background:var(--card);border:2px solid var(--border);border-radius:8px;padding:11px 12px;margin-bottom:4px;display:flex;align-items:flex-start;gap:9px}
+.re-info{flex:1;min-width:0}
+.re-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px}
+.re-subj{font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:3px;color:white;font-weight:600}
+.re-type{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.re-type.d1{color:var(--green)} .re-type.d4{color:var(--blue)} .re-type.d7{color:var(--gold)}
+.re-text{font-size:12px;color:var(--ink);margin-bottom:2px;word-break:break-word}
+.re-meta{font-size:10px;color:var(--muted)}
+.re-xp{font-size:9px;color:#ffd700;font-weight:700}
+.re-actions{display:flex;flex-direction:column;gap:5px;flex-shrink:0}
+.check-btn{width:22px;height:22px;border-radius:5px;border:1.5px solid var(--border);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .15s}
+.check-btn.done{background:#22c55e;border-color:#22c55e;color:white}
+.del-btn{width:20px;height:20px;border:none;background:none;color:var(--muted);cursor:pointer;font-size:16px;line-height:1}
+.del-btn:hover{color:var(--red)}
+.empty-msg{padding:13px;background:var(--card2);border-radius:7px;font-size:12px;color:var(--muted);text-align:center;margin-bottom:6px}
+
+/* ── Review ── */
+.review-card{background:var(--card);border:2px solid var(--border);border-radius:8px;padding:13px;margin-bottom:8px}
+.review-q{font-size:12px;font-weight:600;color:var(--ink);margin:9px 0 4px}
+.review-q:first-child{margin-top:0}
+.review-ans{width:100%;background:var(--card2);border:1.5px solid var(--border);border-radius:5px;padding:8px 10px;color:var(--ink);font-size:12px;resize:none;outline:none;min-height:55px;font-family:'DM Sans',sans-serif}
+.review-ans:focus{border-color:var(--gold)}
+.review-stat{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--card2);border-radius:5px;margin-bottom:3px}
+.review-stat-l{font-size:12px;color:var(--muted)}
+.review-stat-v{font-family:'Pirata One',serif;font-size:16px;color:var(--red)}
+
+/* ── Pirate code ── */
+.code-card{display:flex;gap:11px;background:var(--card);border:2px solid var(--border);border-radius:7px;padding:10px 12px;margin-bottom:4px}
+.code-em{font-size:18px;flex-shrink:0}
+.code-title{font-size:12px;font-weight:600;color:var(--navy);margin-bottom:1px}
+.code-sub{font-size:11px;color:var(--muted)}
+
+/* ── Swipe hint dots ── */
+.swipe-dots{display:flex;justify-content:center;gap:6px;padding:6px 0 4px;flex-shrink:0;background:var(--bg)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--border);transition:all .2s;cursor:pointer}
+.dot.active{background:var(--red);width:18px;border-radius:3px}
+
+/* ── Toast ── */
+.toast{position:fixed;top:68px;left:50%;transform:translateX(-50%);background:var(--navy);border:2px solid #ffd700;border-radius:7px;padding:9px 18px;color:#ffd700;font-family:'Pirata One',serif;font-size:15px;z-index:999;pointer-events:none;animation:toastIn .3s ease;white-space:nowrap}
+@keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+
+/* ── Modal ── */
+.modal-overlay{position:fixed;inset:0;background:#00000099;display:flex;align-items:center;justify-content:center;z-index:1000;padding:16px}
+.modal-box{background:var(--card2);border:2.5px solid #ffd700;border-radius:12px;padding:20px;width:100%;max-width:360px;text-align:center;box-shadow:5px 5px 0 var(--gold)}
+.modal-em{font-size:44px;animation:bounce 1s ease infinite alternate;display:block;margin-bottom:6px}
+@keyframes bounce{from{transform:translateY(0)}to{transform:translateY(-7px)}}
+.modal-title{font-family:'Pirata One',serif;font-size:24px;color:var(--red);margin-bottom:4px}
+.modal-sub{font-family:'Pirata One',serif;font-size:16px;color:var(--navy);margin-bottom:10px}
+.modal-body{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:14px}
+.modal-ok{width:100%;padding:11px;border:none;border-radius:7px;background:var(--red);color:white;font-family:'Pirata One',serif;font-size:16px;cursor:pointer}
+.modal-btns{display:flex;gap:8px;margin-top:12px}
+.modal-btn{flex:1;padding:10px;border:none;border-radius:6px;font-family:'Pirata One',serif;font-size:13px;cursor:pointer}
+.modal-btn.danger{background:var(--red);color:white}
+.modal-btn.cancel{background:var(--card2);color:var(--muted);border:1.5px solid var(--border)}
+`;
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  SMALL COMPONENTS
+// ═══════════════════════════════════════════════════════════════════════════
+function Toast({ msg, onDone }) {
+  useEffect(() => { const t = setTimeout(onDone, 1800); return () => clearTimeout(t); }, []);
+  return <div className="toast">{msg}</div>;
+}
+
+function LevelUpModal({ rank, onClose }) {
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-box" onClick={e => e.stopPropagation()}>
+        <span className="modal-em">{rank.emoji}</span>
+        <div className="modal-title">RANK UP!!</div>
+        <div className="modal-sub">{rank.name}</div>
+        <div className="modal-body">Bounty: <strong>{rank.bounty} Berries</strong><br/>The World Government trembles!</div>
+        <button className="modal-ok" onClick={onClose}>YOSH! LET'S GO! 🏴‍☠️</button>
+      </div>
+    </div>
+  );
+}
+
+function CheckItem({ checked, label, xp, onClick }) {
+  return (
+    <div className={`ci${checked ? " done" : ""}`} onClick={onClick}>
+      <div className="ci-box">{checked && "✓"}</div>
+      <span className="ci-text">{label}</span>
+      {xp && <span className="ci-xp">+{xp}XP</span>}
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  SWIPE TABS WRAPPER
+// ═══════════════════════════════════════════════════════════════════════════
+function SwipeTabs({ tabIndex, setTabIndex, children }) {
+  const trackRef   = useRef(null);
+  const startXRef  = useRef(null);
+  const startYRef  = useRef(null);
+  const lockRef    = useRef(null); // "horiz" | "vert" | null
+
+  const goTo = useCallback((i) => {
+    setTabIndex(Math.max(0, Math.min(TAB_IDS.length - 1, i)));
+  }, [setTabIndex]);
+
+  const onTouchStart = useCallback((e) => {
+    startXRef.current = e.touches[0].clientX;
+    startYRef.current = e.touches[0].clientY;
+    lockRef.current   = null;
+  }, []);
+
+  const onTouchMove = useCallback((e) => {
+    if (!startXRef.current) return;
+    const dx = e.touches[0].clientX - startXRef.current;
+    const dy = e.touches[0].clientY - startYRef.current;
+
+    // Lock direction on first significant move
+    if (!lockRef.current && (Math.abs(dx) > 8 || Math.abs(dy) > 8)) {
+      lockRef.current = Math.abs(dx) > Math.abs(dy) ? "horiz" : "vert";
+    }
+
+    // Only prevent default & move if horizontal swipe
+    if (lockRef.current === "horiz") {
+      e.preventDefault();
+    }
+  }, []);
+
+  const onTouchEnd = useCallback((e) => {
+    if (lockRef.current !== "horiz" || !startXRef.current) { startXRef.current = null; return; }
+    const dx = e.changedTouches[0].clientX - startXRef.current;
+    if (Math.abs(dx) > 50) {
+      if (dx < 0) goTo(tabIndex + 1);
+      else         goTo(tabIndex - 1);
+    }
+    startXRef.current = null;
+    lockRef.current   = null;
+  }, [tabIndex, goTo]);
+
+  useEffect(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    el.addEventListener("touchmove", onTouchMove, { passive: false });
+    return () => el.removeEventListener("touchmove", onTouchMove);
+  }, [onTouchMove]);
+
+  return (
+    <div className="swipe-container"
+      ref={trackRef}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}>
+      <div className="swipe-track"
+        style={{ transform: `translateX(-${tabIndex * 100}%)` }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  MAIN APP
+// ═══════════════════════════════════════════════════════════════════════════
+function App() {
+  const [state,   setState]   = useState(null); // null = loading
+  const [tabIdx,  setTabIdx]  = useState(0);
+  const [toast,   setToast]   = useState(null);
+  const [levelUp, setLevelUp] = useState(null);
+  const [delId,   setDelId]   = useState(null);
+  const [viewDate, setViewDate] = useState(() => today());
+
+  // Revision form state
+  const [revSubj, setRevSubj] = useState("Pharmacology");
+  const [revText, setRevText] = useState("");
+  const [revDateStr, setRevDateStr] = useState(() => {
+    const d = today();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+  });
+
+  const saveTimer = useRef(null);
+  const prevXP    = useRef(0);
+
+  // ── Load ──────────────────────────────────────────────────────────────
+  useEffect(() => {
+    loadData().then(s => {
+      setState(s);
+      prevXP.current = calcXP(s.days, s.revs);
+    });
+  }, []);
+
+  // ── Persist (debounced) ───────────────────────────────────────────────
+  const persist = useCallback((s) => {
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(() => saveData(s), 500);
+  }, []);
+
+  // ── Rank-up check ─────────────────────────────────────────────────────
+  const checkRankUp = useCallback((newState) => {
+    const newXP = calcXP(newState.days, newState.revs);
+    const gained = newXP - prevXP.current;
+    const oldRank = getRank(prevXP.current);
+    const newRank = getRank(newXP);
+    if (gained > 0) setToast(`+${gained} XP ⚡`);
+    if (newRank.name !== oldRank.name && newXP > prevXP.current) {
+      setTimeout(() => setLevelUp(newRank), 700);
+    }
+    prevXP.current = newXP;
+  }, []);
+
+  // ── Updater helper ────────────────────────────────────────────────────
+  const update = useCallback((fn) => {
+    setState(prev => {
+      const next = fn(prev);
+      persist(next);
+      checkRankUp(next);
+      return next;
+    });
+  }, [persist, checkRankUp]);
+
+  // ── Actions ───────────────────────────────────────────────────────────
+  const toggleCheck = useCallback((dateKey, id) => {
+    update(s => {
+      const dd = s.days[dateKey] || {};
+      const checks = { ...(dd.checks || {}), [id]: !(dd.checks?.[id]) };
+      return { ...s, days: { ...s.days, [dateKey]: { ...dd, checks } } };
+    });
+  }, [update]);
+
+  const setDayField = useCallback((dateKey, field, val) => {
+    update(s => ({
+      ...s,
+      days: { ...s.days, [dateKey]: { ...(s.days[dateKey] || {}), [field]: val } }
+    }));
+  }, [update]);
+
+  const addRevision = useCallback(() => {
+    if (!revText.trim()) return;
+    const [y,m,d] = revDateStr.split("-").map(Number);
+    const sd = new Date(y, m-1, d); sd.setHours(0,0,0,0);
+    const entry = {
+      id: state.nid, text: revText.trim(), subject: revSubj,
+      studyDate: dkey(sd), rev1Date: dkey(addDays(sd,3)), rev2Date: dkey(addDays(sd,6)),
+      d1done: false, d4done: false, d7done: false, addedAt: Date.now(),
+    };
+    update(s => ({ ...s, revs: [...s.revs, entry], nid: s.nid + 1 }));
+    setRevText("");
+    setToast("🍎 Devil Fruit awakened! +20 XP");
+  }, [revText, revSubj, revDateStr, state, update]);
+
+  const toggleRev = useCallback((id, field) => {
+    update(s => ({
+      ...s,
+      revs: s.revs.map(e => e.id === id ? { ...e, [field]: !e[field] } : e)
+    }));
+  }, [update]);
+
+  const deleteRev = useCallback((id) => {
+    update(s => ({ ...s, revs: s.revs.filter(e => e.id !== id) }));
+    setDelId(null);
+  }, [update]);
+
+  const setReview = useCallback((rkey, qkey, val) => {
+    update(s => ({
+      ...s,
+      rvws: { ...s.rvws, [rkey]: { ...(s.rvws[rkey] || {}), [qkey]: val } }
+    }));
+  }, [update]);
+
+  // ── Tab nav (sync tabs bar + swipe) ──────────────────────────────────
+  const goToTab = useCallback((i) => {
+    setTabIdx(i);
+    // Scroll tab into view
+    const tabEl = document.getElementById(`tab-${TAB_IDS[i]}`);
+    tabEl?.scrollIntoView({ behavior:"smooth", block:"nearest", inline:"center" });
+  }, []);
+
+  // ── Loading ───────────────────────────────────────────────────────────
+  if (!state) return (
+    <>
+      <style>{STYLES}</style>
+      <div className="app" style={{alignItems:"center",justifyContent:"center",background:"var(--navy)"}}>
+        <span style={{fontSize:"52px",marginBottom:"12px"}}>🏴‍☠️</span>
+        <div style={{fontFamily:"'Pirata One',serif",fontSize:"20px",color:"#ffd700"}}>Setting Sail…</div>
+        <div style={{fontSize:"11px",color:"#94a3b8",marginTop:"8px"}}>Loading your saved voyage data</div>
+      </div>
+    </>
+  );
+
+  // ── Derived ───────────────────────────────────────────────────────────
+  const xp       = calcXP(state.days, state.revs);
+  const rank     = getRank(xp);
+  const nextRank = getNextRank(xp);
+  const xpPct    = nextRank ? (xp - rank.min) / (nextRank.min - rank.min) * 100 : 100;
+  const todayKey = dkey(today());
+  const revPending = state.revs.filter(e =>
+    (e.studyDate === todayKey && !e.d1done) ||
+    (e.rev1Date  === todayKey && !e.d4done) ||
+    (e.rev2Date  === todayKey && !e.d7done)
+  ).length;
+
+  const TABS = [
+    { id:"today",   label:"📅 Today"   },
+    { id:"tracker", label:"📊 Tracker"  },
+    { id:"rev",     label:`🔁 1·4·7${revPending > 0 ? ` (${revPending})` : ""}` },
+    { id:"review",  label:"📋 Review"   },
+    { id:"log",     label:"🏴‍☠️ Log"    },
+  ];
+
+  const sharedProps = {
+    state, todayKey, toggleCheck, setDayField, toggleRev, setDelId, setReview,
+  };
+
+  return (
+    <>
+      <style>{STYLES}</style>
+      <div className="app">
+
+        {/* Header */}
+        <div className="hdr">
+          <div>
+            <div className="hdr-title">JARVIS 30-DAY</div>
+            <div className="hdr-sub">
+              April 2026 · {dayNum(today()) >= 0 && dayNum(today()) < 30
+                ? `Day ${dayNum(today())+1}/30` : "Voyage"}
+            </div>
+          </div>
+          <div className="hdr-badge">
+            <div className="hdr-badge-label">Bounty</div>
+            <div className="hdr-badge-val">{rank.bounty}฿</div>
+          </div>
+        </div>
+
+        {/* Tab bar */}
+        <div className="tabs">
+          {TABS.map((t, i) => (
+            <button key={t.id} id={`tab-${t.id}`}
+              className={`tab${tabIdx === i ? " active" : ""}`}
+              onClick={() => goToTab(i)}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Swipeable pages */}
+        <SwipeTabs tabIndex={tabIdx} setTabIndex={goToTab}>
+          <div className="swipe-page"><div className="pad">
+            <TodayPage {...sharedProps} viewDate={viewDate} setViewDate={setViewDate}/>
+          </div></div>
+          <div className="swipe-page"><div className="pad">
+            <TrackerPage state={state}/>
+          </div></div>
+          <div className="swipe-page"><div className="pad">
+            <RevisionPage {...sharedProps}
+              revSubj={revSubj} setRevSubj={setRevSubj}
+              revText={revText} setRevText={setRevText}
+              revDateStr={revDateStr} setRevDateStr={setRevDateStr}
+              onAdd={addRevision}/>
+          </div></div>
+          <div className="swipe-page"><div className="pad">
+            <ReviewPage {...sharedProps}/>
+          </div></div>
+          <div className="swipe-page"><div className="pad">
+            <LogPage xp={xp} rank={rank} nextRank={nextRank} xpPct={xpPct} state={state}/>
+          </div></div>
+        </SwipeTabs>
+
+        {/* Dot indicators */}
+        <div className="swipe-dots">
+          {TABS.map((_, i) => (
+            <div key={i} className={`dot${tabIdx === i ? " active" : ""}`} onClick={() => goToTab(i)}/>
+          ))}
+        </div>
+
+      </div>
+
+      {toast  && <Toast msg={toast} onDone={() => setToast(null)}/>}
+      {levelUp && <LevelUpModal rank={levelUp} onClose={() => setLevelUp(null)}/>}
+      {delId   && (
+        <div className="modal-overlay" onClick={() => setDelId(null)}>
+          <div className="modal-box" onClick={e => e.stopPropagation()}>
+            <span className="modal-em">⚠️</span>
+            <div className="modal-title">Abandon Ability?</div>
+            <div className="modal-body">Removes this topic and all 3 scheduled revisions.</div>
+            <div className="modal-btns">
+              <button className="modal-btn cancel" onClick={() => setDelId(null)}>Cancel</button>
+              <button className="modal-btn danger" onClick={() => deleteRev(delId)}>Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  TODAY PAGE
+// ═══════════════════════════════════════════════════════════════════════════
+function TodayPage({ state, viewDate, setViewDate, toggleCheck, setDayField, toggleRev, setDelId }) {
+  const key    = dkey(viewDate);
+  const dd     = state.days[key] || {};
+  const ch     = dd.checks || {};
+  const dn     = dayNum(viewDate);
+  const wo     = isWorkoutDay(viewDate);
+  const isToday = dkey(viewDate) === dkey(today());
+
+  const c = id => ch[id] || false;
+  const t = id => toggleCheck(key, id);
+
+  const { done, total, pct } = getScore(dd);
+  const morningDone = [c("water500"), c("yoga"), c("posture"), wo ? c("workout") : true, c("left-8am")].filter(Boolean).length;
+  const morningTotal = 5;
+
+  const revToday = state.revs.filter(e =>
+    e.studyDate === key || e.rev1Date === key || e.rev2Date === key
+  );
+
+  return (
+    <>
+      <div className="date-nav">
+        <button className="date-nav-btn" disabled={dn <= 0}  onClick={() => setViewDate(d => addDays(d,-1))}>← Prev</button>
+        <div className="date-nav-center">
+          <div className="date-nav-label">{fmtDate(viewDate)}{isToday ? " 🔴" : ""}</div>
+          <div className="date-nav-sub">Day {dn+1} / 30 · {pct}% complete</div>
+        </div>
+        <button className="date-nav-btn" disabled={dn >= 29} onClick={() => setViewDate(d => addDays(d,1))}>Next →</button>
+      </div>
+
+      {/* Morning */}
+      <div className="section-card gr">
+        <div className="section-title">
+          <span>🌅</span><span style={{color:"var(--green)"}}>Morning Routine</span>
+          <div className="prog-mini">
+            <div className="prog-mini-fill" style={{width:`${morningDone/morningTotal*100}%`,background:"var(--green)"}}/>
+          </div>
+        </div>
+        <CheckItem checked={c("water500")} label="💧 500ml water on waking"             xp={10} onClick={() => t("water500")}/>
+        <CheckItem checked={c("yoga")}     label="🌊 Yoga 20 min (Adriene)"             xp={20} onClick={() => t("yoga")}/>
+        <CheckItem checked={c("posture")}  label="🧘 Posture routine 8–10 min"          xp={10} onClick={() => t("posture")}/>
+        {wo
+          ? <CheckItem checked={c("workout")} label="⚔️ Haki Training — 25 min workout" xp={30} onClick={() => t("workout")}/>
+          : <div className="ci" style={{opacity:.5}}><div className="ci-box"/><span className="ci-text">⚓ Rest day — no workout</span></div>
+        }
+        <CheckItem checked={c("left-8am")} label="🏃 Reached library by 8 AM"          xp={20} onClick={() => t("left-8am")}/>
+        <textarea className="notes-inp" rows={2} placeholder="Morning notes…"
+          value={dd.morningNotes||""} onChange={e => setDayField(key,"morningNotes",e.target.value)}/>
+      </div>
+
+      {/* Study */}
+      <div className="section-card op">
+        <div className="section-title"><span>⚔️</span><span style={{color:"var(--red)"}}>Study Log — One Piece</span></div>
+        <CheckItem checked={c("study-ontime")} label="📖 Started studying by 8 AM" xp={25} onClick={() => t("study-ontime")}/>
+        <div className="study-row">
+          <span className="study-label">⏰ Study start time</span>
+          <input className="study-input" placeholder="7:58 AM"
+            value={dd.studyStart||""} onChange={e => setDayField(key,"studyStart",e.target.value)}/>
+        </div>
+        <div className="study-row">
+          <span className="study-label">📚 Total hours studied</span>
+          <input className="study-input" placeholder="e.g. 8.5"
+            value={dd.studyHours||""} onChange={e => setDayField(key,"studyHours",e.target.value)}/>
+        </div>
+        <div className="study-row">
+          <span className="study-label">🗺️ Topics covered</span>
+          <input className="study-input" style={{width:"130px"}} placeholder="Pharma Ch4…"
+            value={dd.topics||""} onChange={e => setDayField(key,"topics",e.target.value)}/>
+        </div>
+        {revToday.length > 0 && (
+          <>
+            <div className="sec-label" style={{color:"var(--red)"}}>🔁 Revisions due today</div>
+            {revToday.map(e => {
+              const isD7  = e.rev2Date === key;
+              const isD4  = e.rev1Date === key;
+              const type  = isD7 ? "d7" : isD4 ? "d4" : "d1";
+              const field = isD7 ? "d7done" : isD4 ? "d4done" : "d1done";
+              const isDone = e[field];
+              const label  = isD7 ? "⚡ Day 7 Mastery" : isD4 ? "🔁 Day 4 Revision" : "📖 Day 1 Study";
+              const S = SUBJECTS[e.subject] || SUBJECTS["Other"];
+              return (
+                <div key={`${e.id}-${type}`} className="rev-entry" style={{marginBottom:"4px"}}>
+                  <div className="re-info">
+                    <div className="re-top">
+                      <span className="re-subj" style={{background:S.color}}>{S.em} {e.subject}</span>
+                      <span className={`re-type ${type}`}>{label}</span>
+                    </div>
+                    <div className="re-text">{e.text}</div>
+                  </div>
+                  <div className="re-actions">
+                    <button className={`check-btn${isDone?" done":""}`} onClick={() => toggleRev(e.id, field)}>{isDone&&"✓"}</button>
+                    <button className="del-btn" onClick={() => setDelId(e.id)}>×</button>
+                  </div>
+                </div>
+              );
+            })}
+          </>
+        )}
+        <textarea className="notes-inp" rows={3} placeholder="Battle notes: topics, struggles, key concepts…"
+          value={dd.studyNotes||""} onChange={e => setDayField(key,"studyNotes",e.target.value)}/>
+      </div>
+
+      {/* Health */}
+      <div className="section-card hk">
+        <div className="section-title"><span>🏐</span><span style={{color:"var(--hk)"}}>Health — Haikyuu</span></div>
+        <CheckItem checked={c("water3l")}   label="💧 Drank 3 litres of water"     xp={10} onClick={() => t("water3l")}/>
+        <CheckItem checked={c("nojunk")}    label="🥦 No junk food today"           xp={15} onClick={() => t("nojunk")}/>
+        <CheckItem checked={c("nosugar")}   label="🍬 No added sugar"               xp={15} onClick={() => t("nosugar")}/>
+        <CheckItem checked={c("protein")}   label="🥚 Protein at every meal"        xp={10} onClick={() => t("protein")}/>
+        <CheckItem checked={c("skincare")}  label="✨ Skincare (morning + night)"   xp={5}  onClick={() => t("skincare")}/>
+        <CheckItem checked={c("sunscreen")} label="☀️ Sunscreen applied"            xp={5}  onClick={() => t("sunscreen")}/>
+        <CheckItem checked={c("sleep1130")} label="🌙 In bed by 11:30 PM"          xp={15} onClick={() => t("sleep1130")}/>
+        <textarea className="notes-inp" rows={2} placeholder="Health notes…"
+          value={dd.healthNotes||""} onChange={e => setDayField(key,"healthNotes",e.target.value)}/>
+      </div>
+
+      {/* Mental */}
+      <div className="section-card na">
+        <div className="section-title"><span>🍃</span><span style={{color:"var(--orange)"}}>Chakra Check — Naruto</span></div>
+        <div className="mood-row">
+          <span className="mood-label">😊 Mood</span>
+          <input type="range" min="1" max="10" value={dd.mood||5}
+            onChange={e => setDayField(key,"mood",Number(e.target.value))}
+            style={{accentColor:"var(--orange)"}}/>
+          <span className="mood-val" style={{color:"var(--orange)"}}>{dd.mood||5}/10</span>
+        </div>
+        <div className="mood-row">
+          <span className="mood-label">⚡ Energy</span>
+          <input type="range" min="1" max="10" value={dd.energy||5}
+            onChange={e => setDayField(key,"energy",Number(e.target.value))}
+            style={{accentColor:"var(--blue)"}}/>
+          <span className="mood-val" style={{color:"var(--blue)"}}>{dd.energy||5}/10</span>
+        </div>
+        <CheckItem checked={c("journaled")} label="📝 Journaled today" xp={20} onClick={() => t("journaled")}/>
+        <textarea className="notes-inp" rows={4} placeholder="Journal — thoughts, feelings, wins, struggles, gratitude…"
+          value={dd.journal||""} onChange={e => setDayField(key,"journal",e.target.value)}/>
+      </div>
+
+      {/* Detox */}
+      <div className="section-card dt">
+        <div className="section-title"><span>📵</span><span style={{color:"var(--purple)"}}>Digital Detox</span></div>
+        <CheckItem checked={c("noscreen_am")} label="📵 Zero screen first 2 hours after waking" xp={20} onClick={() => t("noscreen_am")}/>
+        <CheckItem checked={c("noscreen_pm")} label="🌙 Zero screen 30 min before bed"          xp={15} onClick={() => t("noscreen_pm")}/>
+        <textarea className="notes-inp" rows={2} placeholder="Detox notes…"
+          value={dd.detoxNotes||""} onChange={e => setDayField(key,"detoxNotes",e.target.value)}/>
+      </div>
+
+      {/* Score */}
+      <div className="score-box">
+        <div style={{fontSize:"11px",color:"#94a3b8",marginBottom:"3px",letterSpacing:".1em",textTransform:"uppercase"}}>Today's Battle Score</div>
+        <div className="score-pct">{pct}%</div>
+        <div className="score-sub">{done} of {total} habits complete</div>
+        <div className="score-bar"><div className="score-fill" style={{width:`${pct}%`}}/></div>
+      </div>
+      <div style={{height:"16px"}}/>
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  TRACKER PAGE
+// ═══════════════════════════════════════════════════════════════════════════
+function TrackerPage({ state }) {
+  const TODAY   = today();
+  const scores  = Array.from({length:30}, (_,i) => getScore(state.days[dkey(addDays(START,i))] || {}));
+  const elapsed = Math.max(1, Array.from({length:30},(_,i)=>addDays(START,i)).filter(d=>d<=TODAY).length);
+  const avg     = Math.round(scores.slice(0,elapsed).reduce((a,s)=>a+s.pct,0) / elapsed);
+  const perfect = scores.filter((s,i) => addDays(START,i) <= TODAY && s.pct===100).length;
+
+  let streak=0, sd=new Date(TODAY);
+  while (sd >= START) {
+    const { pct } = getScore(state.days[dkey(sd)] || {});
+    if (pct === 100) { streak++; sd.setDate(sd.getDate()-1); }
+    else break;
+  }
+
+  const bars = [
+    ["💧 Water 500ml","water500","var(--green)"],["🌊 Yoga","yoga","var(--green)"],
+    ["⚔️ Workout","workout","var(--red)"],["📖 Study on time","study-ontime","var(--red)"],
+    ["💧 Water 3L","water3l","var(--hk)"],["🥦 No junk","nojunk","var(--hk)"],
+    ["✨ Skincare","skincare","var(--hk)"],["🌙 Sleep 11:30","sleep1130","var(--blue)"],
+    ["📵 No screen AM","noscreen_am","var(--purple)"],["📝 Journaled","journaled","var(--orange)"],
+  ];
+
+  return (
+    <>
+      <div className="stats-row">
+        <div className="stat-cell"><div className="stat-val">{streak}</div><div className="stat-lbl">🔥 Streak</div></div>
+        <div className="stat-cell"><div className="stat-val">{avg}%</div><div className="stat-lbl">📊 Avg Score</div></div>
+        <div className="stat-cell"><div className="stat-val">{perfect}</div><div className="stat-lbl">⭐ Perfect Days</div></div>
+      </div>
+      <div className="sec-label" style={{color:"var(--red)"}}>📊 30-Day Grand Line Map</div>
+      <div className="grid-30">
+        {Array.from({length:30},(_,i) => {
+          const date = addDays(START,i);
+          const isT  = dkey(date)===dkey(TODAY), isF = date>TODAY;
+          const {pct} = scores[i];
+          const cls = isT?"gc-today":isF?"gc-future":pct===100?"gc-full":pct>0?"gc-partial":"gc-missed";
+          return (
+            <div key={i} className={`gc ${cls}`}>
+              {date.getDate()}
+              {!isF && !isT && <span className="gc-score">{pct}%</span>}
+            </div>
+          );
+        })}
+      </div>
+      <div className="legend">
+        <div className="legend-item"><div className="legend-dot" style={{background:"#22c55e"}}/>100%</div>
+        <div className="legend-item"><div className="legend-dot" style={{background:"#fef3c7",border:"1px solid var(--gold)"}}/>Partial</div>
+        <div className="legend-item"><div className="legend-dot" style={{background:"#fef2f2",border:"1px solid #fca5a5"}}/>Missed</div>
+        <div className="legend-item"><div className="legend-dot" style={{background:"#f5f5f0"}}/>Upcoming</div>
+      </div>
+      <div className="sec-label" style={{color:"var(--hk)",marginTop:"16px"}}>🏐 Habit Consistency</div>
+      {bars.map(([lbl,id,col]) => {
+        const done = Array.from({length:30},(_,i)=>addDays(START,i)).filter(d=>d<=TODAY&&state.days[dkey(d)]?.checks?.[id]).length;
+        const pct  = Math.round(done/elapsed*100);
+        return (
+          <div key={id} className="habit-bar-row">
+            <div className="habit-bar-top"><span>{lbl}</span><span style={{color:col,fontWeight:"600"}}>{done}/{elapsed}d</span></div>
+            <div className="habit-bar-track"><div className="habit-bar-fill" style={{width:`${pct}%`,background:col}}/></div>
+          </div>
+        );
+      })}
+      <div style={{height:"16px"}}/>
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  REVISION PAGE
+// ═══════════════════════════════════════════════════════════════════════════
+function RevisionPage({ state, revSubj, setRevSubj, revText, setRevText, revDateStr, setRevDateStr, onAdd, toggleRev, setDelId }) {
+  const [filter, setFilter] = useState("Today");
+  const tk = dkey(today());
+  const mastered = state.revs.filter(e => e.d1done && e.d4done && e.d7done).length;
+
+  const items = (() => {
+    if (filter === "Today") return state.revs.flatMap(e => {
+      const out = [];
+      if (e.studyDate===tk) out.push({e,type:"d1",field:"d1done",isDone:e.d1done,label:"📖 Day 1 — Awakening"});
+      if (e.rev1Date===tk)  out.push({e,type:"d4",field:"d4done",isDone:e.d4done,label:"🔁 Day 4 — Training"});
+      if (e.rev2Date===tk)  out.push({e,type:"d7",field:"d7done",isDone:e.d7done,label:"⚡ Day 7 — Mastered"});
+      return out;
+    });
+    if (filter === "All") return state.revs.flatMap(e => [
+      {e,type:"d1",field:"d1done",isDone:e.d1done,label:"📖 D1"},
+      {e,type:"d4",field:"d4done",isDone:e.d4done,label:"🔁 D4"},
+      {e,type:"d7",field:"d7done",isDone:e.d7done,label:"⚡ D7"},
+    ]);
+    return state.revs.filter(e=>e.subject===filter).flatMap(e=>[
+      {e,type:"d1",field:"d1done",isDone:e.d1done,label:"📖 D1"},
+      {e,type:"d4",field:"d4done",isDone:e.d4done,label:"🔁 D4"},
+      {e,type:"d7",field:"d7done",isDone:e.d7done,label:"⚡ D7"},
+    ]);
+  })();
+
+  return (
+    <>
+      <div className="th op">
+        <div className="th-title">🍎 Devil Fruit Mastery</div>
+        <div className="th-sub">1·4·7 · {state.revs.length} topics · {mastered} mastered · {Object.keys(SUBJECTS).length} subjects</div>
+      </div>
+
+      {/* Add form */}
+      <div className="rev-form">
+        <div className="rev-title">+ Awaken New Ability</div>
+        <div style={{display:"flex",alignItems:"center",gap:"8px",marginBottom:"8px"}}>
+          <span style={{fontSize:"12px",color:"var(--muted)",whiteSpace:"nowrap"}}>Study date:</span>
+          <input type="date" className="date-inp" value={revDateStr} onChange={e=>setRevDateStr(e.target.value)}/>
+        </div>
+        <div className="filter-grid">
+          {Object.entries(SUBJECTS).map(([name,s]) => (
+            <button key={name}
+              className={`filter-btn${revSubj===name?" active":""}`}
+              style={revSubj===name?{background:s.color,borderColor:s.color}:{}}
+              onClick={()=>setRevSubj(name)}>
+              {s.em} {name}
+            </button>
+          ))}
+        </div>
+        <input className="text-inp" placeholder="e.g. Beta blockers — mechanism, uses, side effects"
+          value={revText} onChange={e=>setRevText(e.target.value)}
+          onKeyDown={e=>e.key==="Enter"&&onAdd()}/>
+        <button className="add-btn" disabled={!revText.trim()} onClick={onAdd}>
+          ADD — AUTO-SCHEDULES DAY 1 · 4 · 7
+        </button>
+      </div>
+
+      {/* Filter bar */}
+      <div className="filter-grid">
+        {["Today","All",...Object.keys(SUBJECTS).filter(s=>state.revs.some(e=>e.subject===s))].map(f => {
+          const S = SUBJECTS[f];
+          return (
+            <button key={f} className={`filter-btn${filter===f?" active":""}`}
+              style={filter===f?{background:S?.color||"var(--red)",borderColor:S?.color||"var(--red)"}:{}}
+              onClick={()=>setFilter(f)}>{f}
+            </button>
+          );
+        })}
+      </div>
+
+      {items.length === 0 && (
+        <div className="empty-msg">
+          {filter==="Today" ? "No revisions due today — add a new topic above ↑" : "No topics yet for this subject."}
+        </div>
+      )}
+
+      {items.map(({e,type,field,isDone,label}) => {
+        const S = SUBJECTS[e.subject] || SUBJECTS["Other"];
+        const xpVal = type==="d7"?50:type==="d4"?30:20;
+        return (
+          <div key={`${e.id}-${type}`} className="rev-entry">
+            <div className="re-info">
+              <div className="re-top">
+                <span className="re-subj" style={{background:S.color}}>{S.em} {e.subject}</span>
+                <span className={`re-type ${type}`}>{label}</span>
+              </div>
+              <div className="re-text">{e.text}</div>
+              {type!=="d1" && <div className="re-meta">Studied: {fmtShort(fromKey(e.studyDate))}</div>}
+              <div className="re-xp">+{xpVal} Berries on complete</div>
+            </div>
+            <div className="re-actions">
+              <button className={`check-btn${isDone?" done":""}`} onClick={()=>toggleRev(e.id,field)}>{isDone&&"✓"}</button>
+              <button className="del-btn" onClick={()=>setDelId(e.id)}>×</button>
+            </div>
+          </div>
+        );
+      })}
+      <div style={{height:"16px"}}/>
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  REVIEW PAGE
+// ═══════════════════════════════════════════════════════════════════════════
+function ReviewPage({ state, todayKey, setReview }) {
+  const [type, setType] = useState("daily");
+  const TODAY   = today();
+  const elapsed = Math.max(1,Array.from({length:30},(_,i)=>addDays(START,i)).filter(d=>d<=TODAY).length);
+  const scores  = Array.from({length:30},(_,i)=>getScore(state.days[dkey(addDays(START,i))]||{}));
+  const avg     = Math.round(scores.slice(0,elapsed).reduce((a,s)=>a+s.pct,0)/elapsed);
+  const mastered = state.revs.filter(e=>e.d1done&&e.d4done&&e.d7done).length;
+  const dd = state.days[todayKey] || {};
+
+  const RQ = ({qKey,label,rkey}) => (
+    <div>
+      <div className="review-q">{label}</div>
+      <textarea className="review-ans" rows={3} placeholder="Write here…"
+        value={state.rvws[rkey]?.[qKey]||""}
+        onChange={e => setReview(rkey,qKey,e.target.value)}/>
+    </div>
+  );
+  const RS = ({label,value}) => (
+    <div className="review-stat">
+      <span className="review-stat-l">{label}</span>
+      <span className="review-stat-v">{value}</span>
+    </div>
+  );
+
+  return (
+    <>
+      <div className="filter-grid" style={{marginBottom:"12px"}}>
+        {["daily","weekly","15-day","30-day"].map(t => (
+          <button key={t} className={`filter-btn${type===t?" active":""}`}
+            style={type===t?{background:"var(--teal)",borderColor:"var(--teal)"}:{}}
+            onClick={()=>setType(t)}>
+            {t.charAt(0).toUpperCase()+t.slice(1)}
+          </button>
+        ))}
+      </div>
+
+      {type==="daily" && (
+        <div className="review-card">
+          <div style={{fontFamily:"'Pirata One',serif",fontSize:"16px",color:"var(--red)",marginBottom:"10px"}}>
+            ⚔️ Battle Report — {fmtDate(TODAY)}
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"5px",marginBottom:"10px"}}>
+            <RS label="📊 Score"  value={`${getScore(dd).pct}%`}/>
+            <RS label="⏰ Start"  value={dd.studyStart||"—"}/>
+            <RS label="📚 Hours"  value={dd.studyHours||"—"}/>
+            <RS label="😊 Mood"   value={`${dd.mood||5}/10`}/>
+          </div>
+          <RQ qKey="win"       label="⚔️ What did I conquer today?"    rkey={`d-${todayKey}`}/>
+          <RQ qKey="hard"      label="🌊 What was hard?"               rkey={`d-${todayKey}`}/>
+          <RQ qKey="grateful"  label="🍃 One thing I'm grateful for:"  rkey={`d-${todayKey}`}/>
+          <RQ qKey="tomorrow"  label="🎯 Tomorrow I will…"             rkey={`d-${todayKey}`}/>
+        </div>
+      )}
+
+      {type==="weekly" && [1,2,3,4].map(w => (
+        <div key={w} className="review-card">
+          <div style={{fontFamily:"'Pirata One',serif",fontSize:"15px",color:"var(--teal)",marginBottom:"10px"}}>
+            📆 Week {w} — {fmtShort(addDays(START,(w-1)*7))} to {fmtShort(addDays(START,w*7-1))}
+          </div>
+          {(()=>{
+            const wd  = Array.from({length:7},(_,i)=>addDays(START,(w-1)*7+i));
+            const wa  = Math.round(wd.reduce((a,d)=>a+getScore(state.days[dkey(d)]||{}).pct,0)/7);
+            const wt  = wd.filter(d=>state.days[dkey(d)]?.checks?.["study-ontime"]).length;
+            const ww  = wd.filter(d=>state.days[dkey(d)]?.checks?.["workout"]).length;
+            return (
+              <>
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"4px",marginBottom:"10px"}}>
+                  <RS label="📊 Avg"      value={`${wa}%`}/>
+                  <RS label="⏰ On-time"  value={`${wt}/7`}/>
+                  <RS label="⚔️ Workouts" value={`${ww}/3`}/>
+                  <RS label="🍎 Topics"   value={`${state.revs.length}`}/>
+                </div>
+                <RQ qKey="best"   label="What went best?"          rkey={`w-${w}`}/>
+                <RQ qKey="change" label="What needs to change?"    rkey={`w-${w}`}/>
+                <RQ qKey="goal"   label="Next week's one goal:"    rkey={`w-${w}`}/>
+              </>
+            );
+          })()}
+        </div>
+      ))}
+
+      {type==="15-day" && (
+        <div className="review-card">
+          <div style={{fontFamily:"'Pirata One',serif",fontSize:"15px",color:"var(--purple)",marginBottom:"10px"}}>
+            🌗 15-Day Halfway Review
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"4px",marginBottom:"10px"}}>
+            <RS label="📊 Avg Score" value={`${avg}%`}/>
+            <RS label="⏰ On-time"   value={`${Array.from({length:15},(_,i)=>addDays(START,i)).filter(d=>state.days[dkey(d)]?.checks?.["study-ontime"]).length}/15`}/>
+            <RS label="⚔️ Workouts"  value={`${Array.from({length:15},(_,i)=>addDays(START,i)).filter(d=>state.days[dkey(d)]?.checks?.["workout"]).length}`}/>
+            <RS label="🍎 Topics"    value={`${state.revs.length}`}/>
+          </div>
+          <RQ qKey="sticking" label="Best sticking habit?"         rkey="r15"/>
+          <RQ qKey="broken"   label="Habit falling apart?"         rkey="r15"/>
+          <RQ qKey="change"   label="Changes for second half?"     rkey="r15"/>
+          <RQ qKey="targets"  label="Second-half targets:"         rkey="r15"/>
+        </div>
+      )}
+
+      {type==="30-day" && (
+        <div className="review-card">
+          <div style={{fontFamily:"'Pirata One',serif",fontSize:"17px",color:"var(--red)",marginBottom:"10px"}}>
+            🏴‍☠️ Month-End Reckoning — April 2026
+          </div>
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"4px",marginBottom:"10px"}}>
+            <RS label="📊 Final Avg" value={`${avg}%`}/>
+            <RS label="⭐ Perfect"   value={`${scores.filter((s,i)=>addDays(START,i)<=TODAY&&s.pct===100).length}d`}/>
+            <RS label="🍎 Topics"    value={`${state.revs.length}`}/>
+            <RS label="⚡ Mastered"  value={`${mastered}`}/>
+          </div>
+          <RQ qKey="proud"  label="⚔️ Most proud of this month?"          rkey="r30"/>
+          <RQ qKey="neet"   label="📚 NEET prep — how did studying go?"   rkey="r30"/>
+          <RQ qKey="body"   label="💪 Physical changes noticed?"          rkey="r30"/>
+          <RQ qKey="mental" label="🍃 Mental health this month?"          rkey="r30"/>
+          <RQ qKey="island" label="🗺️ What island did you conquer?"       rkey="r30"/>
+          <RQ qKey="may"    label="🎯 What changes for May?"              rkey="r30"/>
+        </div>
+      )}
+      <div style={{height:"16px"}}/>
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  LOG PAGE
+// ═══════════════════════════════════════════════════════════════════════════
+function LogPage({ xp, rank, nextRank, xpPct, state }) {
+  let streak=0, sd=new Date(today());
+  while (sd >= START) {
+    const { pct } = getScore(state.days[dkey(sd)] || {});
+    if (pct === 100) { streak++; sd.setDate(sd.getDate()-1); }
+    else break;
+  }
+
+  return (
+    <>
+      {/* Wanted poster */}
+      <div className="wanted">
+        <div className="wanted-tag">— WANTED —</div>
+        <span className="wanted-emoji">🏴‍☠️</span>
+        <div className="wanted-tag">MONKEY D. LUFFY</div>
+        <div className="wanted-rank">{rank.name}</div>
+        <div className="wanted-bounty">{rank.bounty}</div>
+        <div className="wanted-berry">BERRIES</div>
+        <div className="xp-wrap">
+          <div className="xp-labels">
+            <span>{xp} XP</span>
+            <span>{nextRank ? `${nextRank.min-xp} XP to "${nextRank.name}"` : "MAX RANK 🏆"}</span>
+          </div>
+          <div className="xp-track"><div className="xp-fill" style={{width:`${Math.min(100,xpPct)}%`}}/></div>
+        </div>
+      </div>
+
+      <div className="stats-row">
+        <div className="stat-cell"><div className="stat-val">{streak}</div><div className="stat-lbl">🔥 Streak</div></div>
+        <div className="stat-cell"><div className="stat-val">{xp}</div><div className="stat-lbl">⚡ Total XP</div></div>
+        <div className="stat-cell"><div className="stat-val">{Math.max(0,dayNum(today())+1)}/30</div><div className="stat-lbl">⚓ Day</div></div>
+      </div>
+
+      <div className="sec-label" style={{color:"var(--red)"}}>Your Crew</div>
+      <div className="crew-grid">
+        {CREW.map(c => (
+          <div key={c.name} className={`crew-card${xp>=c.xp?"":" locked"}`} style={xp>=c.xp?{borderColor:c.color}:{}}>
+            <div className="crew-emoji">{c.emoji}</div>
+            <div className="crew-name" style={xp>=c.xp?{color:c.color}:{}}>{c.name}</div>
+            <div className="crew-role">{xp>=c.xp?c.role:`Unlocks at ${c.xp} XP`}</div>
+          </div>
+        ))}
+      </div>
+
+      <div className="sec-label" style={{color:"var(--red)"}}>⚓ Pirate Code</div>
+      {[
+        ["⚓","500ml water on waking","Before phone. Before anything."],
+        ["🥩","Protein at every meal","Eggs, dal, sprouts — every meal."],
+        ["🏝️","Post-lunch walk 10–15 min","Kills brain fog. Improves afternoon focus."],
+        ["🧘","Never skip yoga + posture","10 min even on worst days."],
+        ["🌙","Sleep by 11:30 PM","Fat loss + NEET memory consolidation."],
+        ["📵","No screen first 2 hours","BDNF peaks — protect this window."],
+      ].map(([em,title,sub]) => (
+        <div key={title} className="code-card">
+          <span className="code-em">{em}</span>
+          <div><div className="code-title">{title}</div><div className="code-sub">{sub}</div></div>
+        </div>
+      ))}
+      <div style={{height:"16px"}}/>
+    </>
+  );
+}
+
+
+// Mount the app
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(React.createElement(App));
+</script>
+</body>
+</html>
