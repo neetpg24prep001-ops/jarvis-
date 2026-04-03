@@ -300,4 +300,87 @@ function CI({checked, label, xp, onClick}) {
 }
 
 function Toast({msg, onDone}) {
-  useEffect(()=>{ const t=setTimeout(onDone,1800); return ()=>clearTim
+  useEffect(() => {
+    const t = setTimeout(onDone, 1800);
+    return () => clearTimeout(t);
+  }, [onDone]);
+
+  return e('div', { className: 'toast' }, msg);
+}
+
+// ── MAIN APP COMPONENT ──
+function App() {
+  const [data, setData] = useState(loadData);
+  const [view, setView] = useState(0); // 0:Home, 1:Logs, 2:Stats
+  const [toast, setToast] = useState(null);
+
+  useEffect(() => {
+    saveData(data);
+  }, [data]);
+
+  const showToast = (m) => setToast(m);
+
+  // Simple Page Router
+  const renderPage = () => {
+    const todayKey = dkey(today());
+    const dayData = data.days[todayKey] || { checks: {} };
+
+    if (view === 0) {
+      return e('div', { className: 'pg' },
+        e('div', { className: 'sb' },
+          e('div', { className: 'sp' }, calcXP(data.days, data.revs)),
+          e('div', { className: 'ss' }, 'TOTAL BOUNTY (XP)')
+        ),
+        e('div', { className: 'sc op' },
+          e('div', { className: 'sc-t' }, '⚔️ DAILY OBJECTIVES'),
+          ALL_HABITS.map(h => e(CI, {
+            key: h,
+            label: h.replace(/_/g, ' ').toUpperCase(),
+            checked: !!dayData.checks[h],
+            xp: XP_MAP[h],
+            onClick: () => {
+              const newData = { ...data };
+              if (!newData.days[todayKey]) newData.days[todayKey] = { checks: {} };
+              newData.days[todayKey].checks[h] = !newData.days[todayKey].checks[h];
+              setData(newData);
+              if (newData.days[todayKey].checks[h]) showToast("XP GAINED! 🏴‍☠️");
+            }
+          }))
+        )
+      );
+    }
+    return e('div', { className: 'pg' }, e('div', { className: 'em' }, 'More features loading soon...'));
+  };
+
+  return e('div', { className: 'app' },
+    e('header', { className: 'hdr' },
+      e('div', null,
+        e('div', { className: 'ht' }, 'JARVIS-30'),
+        e('div', { className: 'hs' }, 'NEW WORLD PROTOCOL')
+      )
+    ),
+    renderPage(),
+    toast && e(Toast, { msg: toast, onDone: () => setToast(null) }),
+    e('div', { className: 'dots' },
+      [0, 1, 2].map(i => e('div', {
+        key: i,
+        className: 'dot' + (view === i ? ' on' : ''),
+        onClick: () => setView(i)
+      }))
+    )
+  );
+}
+
+// ── MOUNT APP ──
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(e(App));
+
+// Hide loader and show app
+document.getElementById('loading').style.display = 'none';
+document.getElementById('root').style.display = 'block';
+
+</script>
+</body>
+</html>
+
+  
