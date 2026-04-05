@@ -5,280 +5,272 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1e3a5f">
 <title>Jarvis 30-Day</title>
 <link rel="manifest" href="manifest.json">
 <style>
-
-@import url('https://fonts.googleapis.com/css2?family=Pirata+One&family=DM+Sans:wght@400;500;600&display=swap');
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{--bg:#fef9f0;--card:#fff;--c2:#fdf5e6;--bd:#f0d9a0;--ink:#1a0a00;--mt:#8b6914;--red:#dc2626;--gold:#d97706;--navy:#1e3a5f;--blue:#3b82f6;--purple:#7c3aed;--orange:#ea580c;--green:#059669;--hk:#f97316;--teal:#0f766e}
-html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:'DM Sans',sans-serif;font-size:14px}
-.app{display:flex;flex-direction:column;height:100vh;max-width:500px;margin:0 auto;overflow:hidden}
+:root{
+  --bg:#fef9f0;--card:#fff;--c2:#fdf5e6;--bd:#f0d9a0;
+  --ink:#1a0a00;--mt:#8b6914;
+  --red:#dc2626;--gold:#d97706;--navy:#1e3a5f;
+  --blue:#3b82f6;--purple:#7c3aed;--orange:#ea580c;
+  --green:#059669;--hk:#f97316;--teal:#0f766e;
+}
+@import url('https://fonts.googleapis.com/css2?family=Pirata+One&family=DM+Sans:wght@400;500;600&display=swap');
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:'DM Sans',sans-serif,system-ui;font-size:14px}
+.app{display:flex;flex-direction:column;height:100vh;max-width:500px;margin:0 auto}
+/* Header */
 .hdr{background:var(--navy);border-bottom:3px solid #ffd700;padding:10px 14px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
-.ht{font-family:'Pirata One',serif;font-size:18px;color:#ffd700;line-height:1}
+.ht{font-family:'Pirata One',Georgia,serif;font-size:18px;color:#ffd700;line-height:1}
 .hs{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;margin-top:2px}
 .hb{background:#0f2540;border:1.5px solid #ffd700;border-radius:5px;padding:4px 10px;text-align:center}
 .hbl{font-size:7px;letter-spacing:.15em;text-transform:uppercase;color:#94a3b8}
-.hbv{font-family:'Pirata One',serif;font-size:13px;color:#ffd700;line-height:1}
+.hbv{font-family:'Pirata One',Georgia,serif;font-size:13px;color:#ffd700;line-height:1}
+/* Tabs */
 .tabs{background:var(--card);border-bottom:2px solid var(--bd);display:flex;overflow-x:auto;flex-shrink:0;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
-.tab{padding:10px 13px;border:none;background:none;cursor:pointer;white-space:nowrap;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mt);position:relative;flex-shrink:0;font-family:'DM Sans',sans-serif}
+.tab{padding:10px 13px;border:none;background:none;cursor:pointer;white-space:nowrap;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mt);position:relative;flex-shrink:0;font-family:inherit}
 .tab.on{color:var(--red);font-weight:600}
 .tab.on::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:2px;background:var(--red)}
-.pg{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:14px}
-.pg::-webkit-scrollbar{width:2px}
-.pg::-webkit-scrollbar-thumb{background:var(--bd)}
+/* Pages */
+.pages{flex:1;overflow:hidden;position:relative}
+.page{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;display:none}
+.page.on{display:block}
+/* Date nav */
 .dnav{background:var(--navy);border:2px solid #ffd700;border-radius:7px;padding:9px 13px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
-.dnav-btn{background:none;border:1.5px solid #ffd700;border-radius:4px;color:#ffd700;padding:5px 11px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif}
-.dnav-btn:disabled{opacity:.25;cursor:default}
+.dnav button{background:none;border:1.5px solid #ffd700;border-radius:4px;color:#ffd700;padding:5px 11px;font-size:11px;cursor:pointer;font-family:inherit}
+.dnav button:disabled{opacity:.25}
 .dnav-c{text-align:center}
-.dnav-l{font-family:'Pirata One',serif;font-size:14px;color:#ffd700}
+.dnav-l{font-family:'Pirata One',Georgia,serif;font-size:14px;color:#ffd700}
 .dnav-s{font-size:9px;color:#94a3b8;margin-top:1px}
+/* Section cards */
 .sc{background:var(--card);border:2px solid var(--bd);border-radius:8px;padding:12px;margin-bottom:7px}
 .sc.op{border-top:3px solid var(--red)}
 .sc.gr{border-top:3px solid var(--green)}
 .sc.hk{border-top:3px solid var(--hk)}
 .sc.na{border-top:3px solid var(--orange)}
 .sc.dt{border-top:3px solid var(--purple)}
-.sc-t{font-family:'Pirata One',serif;font-size:14px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.sc-t{font-family:'Pirata One',Georgia,serif;font-size:14px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+/* Checklist */
 .ci{display:flex;align-items:center;gap:9px;padding:9px 10px;margin-bottom:3px;background:var(--c2);border-radius:6px;cursor:pointer;user-select:none;-webkit-user-select:none}
 .ci.ck{background:#f0fdf4}
-.ci.ck .ct{color:#86efac;text-decoration:line-through}
-.cb{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--bd);background:white;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px}
+.ci.ck .ct{color:var(--green);text-decoration:line-through}
+.cb{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--bd);background:white;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;transition:all .15s}
 .ci.ck .cb{background:#22c55e;border-color:#22c55e;color:white}
 .ct{font-size:13px;color:var(--ink);flex:1;line-height:1.3}
 .xc{font-size:9px;color:var(--gold);font-weight:700;white-space:nowrap}
-.ni{width:100%;background:var(--c2);border:1.5px solid var(--bd);border-radius:6px;padding:8px 10px;color:var(--ink);font-family:'DM Sans',sans-serif;font-size:12px;resize:none;outline:none;margin-top:6px}
-.ni:focus{border-color:var(--gold)}
-.mr{display:flex;align-items:center;gap:9px;padding:8px 10px;background:var(--c2);border-radius:6px;margin-bottom:3px}
-.ml{font-size:12px;color:var(--ink);width:76px;flex-shrink:0}
-.mv{font-family:'Pirata One',serif;font-size:15px;width:32px;text-align:center;flex-shrink:0}
-input[type=range]{flex:1;height:4px}
+/* Inputs */
+textarea,input[type=text],input[type=date]{background:var(--c2);border:1.5px solid var(--bd);border-radius:6px;color:var(--ink);font-family:inherit;outline:none}
+textarea{width:100%;padding:8px 10px;font-size:12px;resize:none;margin-top:6px}
+textarea:focus,input:focus{border-color:var(--gold)}
 .sr{display:flex;align-items:center;gap:7px;padding:7px 10px;background:var(--c2);border-radius:6px;margin-bottom:3px}
-.slb{font-size:12px;color:var(--ink);flex:1}
-.si{background:white;border:1.5px solid var(--bd);border-radius:5px;padding:4px 8px;color:var(--ink);font-size:12px;width:110px;outline:none;text-align:center;font-family:'DM Sans',sans-serif}
+.sr span{font-size:12px;color:var(--ink);flex:1}
+.sr input{background:white;border:1.5px solid var(--bd);border-radius:5px;padding:4px 8px;color:var(--ink);font-size:12px;width:110px;text-align:center}
+/* Mood */
+.mr{display:flex;align-items:center;gap:9px;padding:8px 10px;background:var(--c2);border-radius:6px;margin-bottom:3px}
+.mr span.ml{font-size:12px;width:76px;flex-shrink:0}
+.mr span.mv{font-family:'Pirata One',Georgia,serif;font-size:15px;width:32px;text-align:center;flex-shrink:0}
+input[type=range]{flex:1;height:4px;background:var(--bd);border-radius:2px;border:none;outline:none}
+/* Score box */
 .sb{background:var(--navy);border:2px solid #ffd700;border-radius:8px;padding:14px;text-align:center;margin-bottom:7px}
-.sp{font-family:'Pirata One',serif;font-size:38px;color:#ffd700;line-height:1;margin-bottom:4px}
+.sp{font-family:'Pirata One',Georgia,serif;font-size:38px;color:#ffd700;line-height:1;margin-bottom:4px}
 .ss{font-size:11px;color:#94a3b8}
 .sbar{height:7px;background:#2d3748;border-radius:4px;margin-top:10px;overflow:hidden}
-.sf{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--red),#ffd700)}
+.sf{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--red),#ffd700);transition:width .5s}
+/* Stats */
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:10px}
 .stc{background:var(--navy);border:2px solid #ffd700;border-radius:7px;padding:11px 8px;text-align:center}
-.stv{font-family:'Pirata One',serif;font-size:21px;color:#ffd700;line-height:1;margin-bottom:2px}
+.stv{font-family:'Pirata One',Georgia,serif;font-size:21px;color:#ffd700;line-height:1;margin-bottom:2px}
 .stl{font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:#94a3b8}
+/* Grid */
 .g30{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;margin:8px 0}
 .gc{aspect-ratio:1;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:9px;font-weight:700;border:1.5px solid transparent}
-.gc-today{background:var(--red);color:white;border-color:#991b1b}
-.gc-full{background:#22c55e;color:white;border-color:#16a34a}
-.gc-partial{background:#fef3c7;color:var(--gold);border-color:var(--gold)}
-.gc-missed{background:#fef2f2;color:#fca5a5;border-color:#fca5a5}
-.gc-future{background:#f5f5f0;color:#d4c4a0}
-.gcs{font-size:7px;opacity:.8}
+.gc.gt{background:var(--red);color:white;border-color:#991b1b}
+.gc.gf{background:#22c55e;color:white;border-color:#16a34a}
+.gc.gp{background:#fef3c7;color:var(--gold);border-color:var(--gold)}
+.gc.gm{background:#fef2f2;color:#fca5a5;border-color:#fca5a5}
+.gc.gu{background:#f5f5f0;color:#d4c4a0}
+.gcs{font-size:7px;display:block}
 .leg{display:flex;gap:10px;flex-wrap:wrap;margin-top:7px}
 .li{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--mt)}
 .ld{width:10px;height:10px;border-radius:2px}
+/* Habit bars */
 .hbr{margin-bottom:7px}
 .hbt{display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px}
 .hbk{height:4px;background:var(--bd);border-radius:2px;overflow:hidden}
-.hbf{height:100%;border-radius:2px}
+.hbf{height:100%;border-radius:2px;transition:width .4s}
+/* Wanted */
 .wanted{background:var(--c2);border:2.5px solid #ffd700;border-radius:10px;padding:14px;margin-bottom:10px;text-align:center;box-shadow:3px 3px 0 var(--gold)}
-.wt{font-family:'Pirata One',serif;font-size:10px;letter-spacing:.3em;color:var(--mt)}
-.wr{font-family:'Pirata One',serif;font-size:18px;color:var(--red);margin-bottom:2px}
-.wb{font-family:'Pirata One',serif;font-size:30px;color:var(--navy);line-height:1}
+.wt{font-family:'Pirata One',Georgia,serif;font-size:10px;letter-spacing:.3em;color:var(--mt)}
+.wr{font-family:'Pirata One',Georgia,serif;font-size:18px;color:var(--red);margin-bottom:2px}
+.wb{font-family:'Pirata One',Georgia,serif;font-size:30px;color:var(--navy);line-height:1}
 .wby{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--mt);margin-bottom:8px}
-.xl{display:flex;justify-content:space-between;font-size:10px;color:var(--mt);margin-bottom:4px}
-.xbar{height:7px;background:#f0d9a0;border-radius:4px;overflow:hidden;border:1px solid var(--gold)}
+.xbar{height:7px;background:#f0d9a0;border-radius:4px;overflow:hidden;border:1px solid var(--gold);margin-top:4px}
 .xf{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--red),#ffd700)}
+/* Crew */
 .cg{display:grid;grid-template-columns:repeat(2,1fr);gap:5px;margin-bottom:10px}
 .cc{background:var(--card);border:2px solid var(--bd);border-radius:8px;padding:10px;text-align:center}
 .cc.lk{opacity:.35;filter:grayscale(1)}
+/* Revision */
 .rf{background:var(--card);border:2px solid var(--bd);border-radius:8px;padding:12px;margin-bottom:10px}
-.rt{font-family:'Pirata One',serif;font-size:15px;color:var(--red);margin-bottom:10px}
+.rt{font-family:'Pirata One',Georgia,serif;font-size:15px;color:var(--red);margin-bottom:10px}
 .fg{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
-.fb{padding:4px 10px;border-radius:20px;border:1.5px solid var(--bd);background:none;color:var(--mt);font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif}
+.fb{padding:4px 10px;border-radius:20px;border:1.5px solid var(--bd);background:none;color:var(--mt);font-size:11px;cursor:pointer;font-family:inherit;transition:all .15s}
 .fb.on{color:white;border-color:transparent}
-.di{flex:1;background:var(--c2);border:1.5px solid var(--bd);border-radius:5px;padding:7px 9px;color:var(--ink);font-size:12px;outline:none;font-family:'DM Sans',sans-serif}
-.ti{width:100%;background:var(--c2);border:1.5px solid var(--bd);border-radius:6px;padding:9px 12px;color:var(--ink);font-size:13px;outline:none;margin-bottom:8px;font-family:'DM Sans',sans-serif}
-.ab{width:100%;padding:11px;border:none;border-radius:6px;background:var(--red);color:white;font-family:'Pirata One',serif;font-size:15px;cursor:pointer}
-.ab:disabled{opacity:.4;cursor:default}
 .re{background:var(--card);border:2px solid var(--bd);border-radius:8px;padding:11px 12px;margin-bottom:4px;display:flex;align-items:flex-start;gap:9px}
-.rl{flex:1;min-width:0}
-.rtp{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px}
+.re .info{flex:1;min-width:0}
+.re .top{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px}
 .rsj{font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:3px;color:white;font-weight:600}
 .rty{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--mt)}
-.rty.d1{color:var(--green)} .rty.d4{color:var(--blue)} .rty.d7{color:var(--gold)}
-.rtx{font-size:12px;color:var(--ink);margin-bottom:2px;word-break:break-word}
-.rmt{font-size:10px;color:var(--mt)}
-.rxp{font-size:9px;color:#ffd700;font-weight:700}
-.ra{display:flex;flex-direction:column;gap:5px;flex-shrink:0}
+.rty.d1{color:var(--green)}.rty.d4{color:var(--blue)}.rty.d7{color:var(--gold)}
+.re .acts{display:flex;flex-direction:column;gap:5px;flex-shrink:0}
 .ck{width:22px;height:22px;border-radius:5px;border:1.5px solid var(--bd);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px}
 .ck.on{background:#22c55e;border-color:#22c55e;color:white}
 .dl{width:20px;height:20px;border:none;background:none;color:var(--mt);cursor:pointer;font-size:16px;line-height:1}
-.em{padding:13px;background:var(--c2);border-radius:7px;font-size:12px;color:var(--mt);text-align:center;margin-bottom:6px}
+.em2{padding:13px;background:var(--c2);border-radius:7px;font-size:12px;color:var(--mt);text-align:center;margin-bottom:6px}
+/* Review */
 .rv{background:var(--card);border:2px solid var(--bd);border-radius:8px;padding:13px;margin-bottom:8px}
 .rq{font-size:12px;font-weight:600;color:var(--ink);margin:9px 0 4px}
 .rq:first-child{margin-top:0}
-.ra2{width:100%;background:var(--c2);border:1.5px solid var(--bd);border-radius:5px;padding:8px 10px;color:var(--ink);font-size:12px;resize:none;outline:none;min-height:55px;font-family:'DM Sans',sans-serif}
 .rstat{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--c2);border-radius:5px;margin-bottom:3px}
-.rsl{font-size:12px;color:var(--mt)}
-.rsv{font-family:'Pirata One',serif;font-size:16px;color:var(--red)}
+/* Misc */
+.sl{font-size:9px;letter-spacing:.22em;text-transform:uppercase;margin:14px 0 8px;color:var(--mt)}
+.sl:first-child{margin-top:0}
 .cc2{display:flex;gap:11px;background:var(--card);border:2px solid var(--bd);border-radius:7px;padding:10px 12px;margin-bottom:4px}
-.sl{font-size:9px;letter-spacing:.22em;text-transform:uppercase;margin:14px 0 8px}
-.toast{position:fixed;top:68px;left:50%;transform:translateX(-50%);background:var(--navy);border:2px solid #ffd700;border-radius:7px;padding:9px 18px;color:#ffd700;font-family:'Pirata One',serif;font-size:15px;z-index:999;pointer-events:none;animation:ti .3s ease;white-space:nowrap}
-@keyframes ti{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
-.mov{position:fixed;inset:0;background:#00000099;display:flex;align-items:center;justify-content:center;z-index:1000;padding:16px}
-.modal{background:var(--c2);border:2.5px solid #ffd700;border-radius:12px;padding:20px;width:100%;max-width:360px;text-align:center;box-shadow:5px 5px 0 var(--gold)}
-.mem{font-size:44px;display:block;margin-bottom:6px;animation:bo 1s ease infinite alternate}
-@keyframes bo{from{transform:translateY(0)}to{transform:translateY(-7px)}}
-.mtt{font-family:'Pirata One',serif;font-size:24px;color:var(--red);margin-bottom:4px}
-.msb{font-family:'Pirata One',serif;font-size:16px;color:var(--navy);margin-bottom:10px}
-.mbd{font-size:12px;color:var(--mt);line-height:1.6;margin-bottom:14px}
-.mok{width:100%;padding:11px;border:none;border-radius:7px;background:var(--red);color:white;font-family:'Pirata One',serif;font-size:16px;cursor:pointer}
-.mbr{display:flex;gap:8px;margin-top:12px}
-.mbt{flex:1;padding:10px;border:none;border-radius:6px;font-family:'Pirata One',serif;font-size:13px;cursor:pointer}
-.mbt.p{background:var(--red);color:white}
-.mbt.s{background:var(--c2);color:var(--mt);border:1.5px solid var(--bd)}
-.dots{display:flex;justify-content:center;gap:6px;padding:5px 0 3px;flex-shrink:0;background:var(--bg)}
-.dot{width:6px;height:6px;border-radius:50%;background:var(--bd);cursor:pointer}
-.dot.on{background:var(--red);width:18px;border-radius:3px}
-.swc{flex:1;overflow:hidden;position:relative}
-.swt{display:flex;height:100%;transition:transform .3s cubic-bezier(.4,0,.2,1)}
-.swp{flex:0 0 100%;height:100%;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:14px}
-.swp::-webkit-scrollbar{width:2px}
-.swp::-webkit-scrollbar-thumb{background:var(--bd)}
 .th{border-radius:8px;padding:12px 14px;margin-bottom:10px}
 .th.op{background:linear-gradient(135deg,#1e3a5f,#0f2540);border:2px solid #ffd700;color:#fff}
-.th-t{font-family:'Pirata One',serif;font-size:18px;line-height:1;margin-bottom:3px}
-.th-s{font-size:10px;opacity:.85}
-.pm{flex:1;height:4px;background:var(--bd);border-radius:2px;overflow:hidden}
-.pmf{height:100%;border-radius:2px}
-
-body{margin:0;background:#1e3a5f}
-#loading{height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#ffd700;font-family:Georgia,serif;text-align:center}
-.sp2{width:28px;height:28px;border:2px solid #ffd70050;border-top-color:#ffd700;border-radius:50%;animation:spin2 1s linear infinite;margin-top:20px}
-@keyframes spin2{to{transform:rotate(360deg)}}
+/* Dots */
+.dots{display:flex;justify-content:center;gap:6px;padding:5px 0 3px;flex-shrink:0;background:var(--bg)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--bd);cursor:pointer;border:none;transition:all .2s}
+.dot.on{background:var(--red);width:18px;border-radius:3px}
+/* Toast */
+.toast{position:fixed;top:68px;left:50%;transform:translateX(-50%);background:var(--navy);border:2px solid #ffd700;border-radius:7px;padding:9px 18px;color:#ffd700;font-family:'Pirata One',Georgia,serif;font-size:15px;z-index:999;pointer-events:none;animation:ti .3s;white-space:nowrap}
+@keyframes ti{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+/* Modal */
+.mov{position:fixed;inset:0;background:#00000099;display:flex;align-items:center;justify-content:center;z-index:1000;padding:16px}
+.modal{background:var(--c2);border:2.5px solid #ffd700;border-radius:12px;padding:20px;width:100%;max-width:360px;text-align:center;box-shadow:5px 5px 0 var(--gold)}
+.modal h2{font-family:'Pirata One',Georgia,serif;font-size:24px;color:var(--red);margin-bottom:4px}
+.modal h3{font-family:'Pirata One',Georgia,serif;font-size:16px;color:var(--navy);margin-bottom:10px}
+.modal p{font-size:12px;color:var(--mt);line-height:1.6;margin-bottom:14px}
+.modal button{padding:11px 20px;border:none;border-radius:7px;background:var(--red);color:white;font-family:'Pirata One',Georgia,serif;font-size:16px;cursor:pointer;width:100%}
+.mbr{display:flex;gap:8px;margin-top:12px}
+.mbr button{flex:1;padding:10px;border:none;border-radius:6px;font-family:'Pirata One',Georgia,serif;font-size:13px;cursor:pointer}
+.mbr button.p{background:var(--red);color:white}
+.mbr button.s{background:var(--c2);color:var(--mt);border:1.5px solid var(--bd)}
 </style>
 </head>
 <body>
-<div id="loading">
-  <div style="font-size:52px;margin-bottom:12px">&#x1F3F4;&#x200D;&#x2620;&#xFE0F;</div>
-  <div style="font-size:22px;margin-bottom:6px;font-family:Georgia,serif">JARVIS 30-DAY</div>
-  <div style="font-size:11px;color:#94a3b8;letter-spacing:.1em">LOADING...</div>
-  <div class="sp2"></div>
+<div class="app" id="app">
+  <div class="hdr">
+    <div>
+      <div class="ht">JARVIS 30-DAY</div>
+      <div class="hs" id="hdr-sub">APRIL 2026</div>
+    </div>
+    <div class="hb">
+      <div class="hbl">BOUNTY</div>
+      <div class="hbv" id="bounty-val">0฿</div>
+    </div>
+  </div>
+  <div class="tabs" id="tabs"></div>
+  <div class="pages" id="pages"></div>
+  <div class="dots" id="dots"></div>
 </div>
-<div id="root" style="display:none"></div>
 
-<!-- React 18 — no Babel needed, pure JS -->
-<script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.production.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.production.min.js"></script>
 <script>
+// ═══════════════════════════════════════
+// JARVIS 30-DAY — Zero Dependencies
+// Pure HTML + CSS + Vanilla JS
+// No React. No CDN. Instant load.
+// ═══════════════════════════════════════
 
-// ═══════════════════════════════════════════════
-// JARVIS 30-DAY — Pure JS, No Babel Required
-// Uses React.createElement directly
-// ═══════════════════════════════════════════════
-const { useState, useEffect, useCallback, useRef } = React;
-const e = React.createElement;
+// ── Storage & Migration ──────────────────────────
+const KEY = 'jarvis-master';
+const VER = 2;
 
-// ── Storage (localStorage) ──────────────────────
-const STORAGE_KEY = "jarvis-master";
-const APP_VERSION = 2;
-
-function freshState() {
-  return { version: APP_VERSION, days: {}, revs: [], nid: 1, rvws: {} };
-}
+function fresh() { return {version:VER,days:{},revs:[],nid:1,rvws:{}}; }
 
 function migrate(raw) {
-  if (!raw) return freshState();
-  let data;
-  try { data = typeof raw === "string" ? JSON.parse(raw) : raw; }
-  catch { return freshState(); }
-  if (!data.version) {
-    data = { version:1, days:data.days||data.dayData||{}, revs:data.revs||data.entries||[], nid:data.nid||data.nextId||1, rvws:data.rvws||data.reviews||{} };
+  if (!raw) return fresh();
+  let d; try { d = JSON.parse(raw); } catch { return fresh(); }
+  if (!d.version) d = {version:1,days:d.days||d.dayData||{},revs:d.revs||d.entries||[],nid:d.nid||d.nextId||1,rvws:d.rvws||d.reviews||{}};
+  if (d.version < 2) {
+    const sm={"Physio":"Physiology","Pharma":"Pharmacology","Patho":"Pathology","Med":"Medicine","Biochem":"Biochemistry","Micro":"Microbiology"};
+    d.revs=(d.revs||[]).map(e=>({...e,subject:sm[e.subject]||e.subject||'Other'}));
+    d.version=2;
   }
-  if (data.version < 2) {
-    const sm = {"Physio":"Physiology","Pharma":"Pharmacology","Patho":"Pathology","Med":"Medicine","Biochem":"Biochemistry","Micro":"Microbiology"};
-    data.revs = (data.revs||[]).map(e => ({...e, subject: sm[e.subject]||e.subject||"Other"}));
-    data.version = 2;
-  }
-  return { version:APP_VERSION, days:data.days||{}, revs:data.revs||[], nid:data.nid||1, rvws:data.rvws||{} };
+  return {version:VER,days:d.days||{},revs:d.revs||[],nid:d.nid||1,rvws:d.rvws||{}};
 }
 
-function loadData() {
-  try { return migrate(localStorage.getItem(STORAGE_KEY)); }
-  catch { return freshState(); }
+function load() { try { return migrate(localStorage.getItem(KEY)); } catch { return fresh(); } }
+let saveTimer;
+function save() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(()=>{ try{localStorage.setItem(KEY,JSON.stringify({...S,version:VER}));}catch{} },500);
 }
 
-function saveData(s) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify({...s, version:APP_VERSION})); } catch{}
-}
+// ── State ────────────────────────────────────────
+let S = load();
 
-// ── Constants ───────────────────────────────────
-const START = new Date(2026, 3, 1);
-const MS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-const WD = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+// ── Constants ────────────────────────────────────
+const START = new Date(2026,3,1);
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const WDAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
 const SUBJECTS = {
-  "Physiology":{c:"#f43f5e",em:"🫀"},"Pharmacology":{c:"#8b5cf6",em:"⚗️"},
-  "Pathology":{c:"#334155",em:"🔬"},"Medicine":{c:"#0ea5e9",em:"⚕️"},
-  "PSM":{c:"#10b981",em:"📊"},"Biochemistry":{c:"#f59e0b",em:"🧬"},
-  "Microbiology":{c:"#84cc16",em:"🦠"},"Anatomy":{c:"#e11d48",em:"🦴"},
-  "FMT":{c:"#0891b2",em:"⚖️"},"Ophthalmology":{c:"#f97316",em:"👁️"},
-  "ENT":{c:"#7c3aed",em:"👂"},"Dermatology":{c:"#db2777",em:"🧴"},
-  "Anaesthesia":{c:"#64748b",em:"💉"},"Radiology":{c:"#0284c7",em:"🔭"},
-  "Psychiatry":{c:"#9333ea",em:"🧠"},"Orthopaedics":{c:"#b45309",em:"🦿"},
-  "Paediatrics":{c:"#16a34a",em:"👶"},"OBG":{c:"#be185d",em:"🌸"},
-  "Surgery":{c:"#dc2626",em:"🔪"},"Other":{c:"#6b7280",em:"📚"}
+  'Physiology':{c:'#f43f5e',em:'🫀'},'Pharmacology':{c:'#8b5cf6',em:'⚗️'},
+  'Pathology':{c:'#334155',em:'🔬'},'Medicine':{c:'#0ea5e9',em:'⚕️'},
+  'PSM':{c:'#10b981',em:'📊'},'Biochemistry':{c:'#f59e0b',em:'🧬'},
+  'Microbiology':{c:'#84cc16',em:'🦠'},'Anatomy':{c:'#e11d48',em:'🦴'},
+  'FMT':{c:'#0891b2',em:'⚖️'},'Ophthalmology':{c:'#f97316',em:'👁️'},
+  'ENT':{c:'#7c3aed',em:'👂'},'Dermatology':{c:'#db2777',em:'🧴'},
+  'Anaesthesia':{c:'#64748b',em:'💉'},'Radiology':{c:'#0284c7',em:'🔭'},
+  'Psychiatry':{c:'#9333ea',em:'🧠'},'Orthopaedics':{c:'#b45309',em:'🦿'},
+  'Paediatrics':{c:'#16a34a',em:'👶'},'OBG':{c:'#be185d',em:'🌸'},
+  'Surgery':{c:'#dc2626',em:'🔪'},'Other':{c:'#6b7280',em:'📚'}
 };
 
 const RANKS = [
-  {name:"East Blue Rookie",min:0,bounty:"0",emoji:"📖"},
-  {name:"Pirate",min:200,bounty:"10M",emoji:"🏴‍☠️"},
-  {name:"Super Rookie",min:500,bounty:"50M",emoji:"⚡"},
-  {name:"Grand Line Capt",min:900,bounty:"150M",emoji:"🔥"},
-  {name:"New World Pirate",min:1400,bounty:"500M",emoji:"💪"},
-  {name:"Yonko Commander",min:2000,bounty:"1B",emoji:"👑"},
-  {name:"PIRATE KING",min:2800,bounty:"∞",emoji:"🏆"},
+  {name:'East Blue Rookie',min:0,bounty:'0',emoji:'📖'},
+  {name:'Pirate',min:200,bounty:'10M',emoji:'🏴‍☠️'},
+  {name:'Super Rookie',min:500,bounty:'50M',emoji:'⚡'},
+  {name:'Grand Line Capt',min:900,bounty:'150M',emoji:'🔥'},
+  {name:'New World Pirate',min:1400,bounty:'500M',emoji:'💪'},
+  {name:'Yonko Commander',min:2000,bounty:'1B',emoji:'👑'},
+  {name:'PIRATE KING',min:2800,bounty:'∞',emoji:'🏆'},
 ];
 
-const XP_MAP = {
-  water500:10,yoga:20,posture:10,workout:30,"left-8am":20,"study-ontime":25,
-  water3l:10,nojunk:15,nosugar:15,protein:10,skincare:5,sunscreen:5,
-  sleep1130:15,noscreen_am:20,noscreen_pm:15,journaled:20
-};
+const XP_MAP = {water500:10,yoga:20,posture:10,workout:30,'left-8am':20,'study-ontime':25,water3l:10,nojunk:15,nosugar:15,protein:10,skincare:5,sunscreen:5,sleep1130:15,noscreen_am:20,noscreen_pm:15,journaled:20};
 
 const CREW = [
-  {name:"Zoro",emoji:"⚔️",xp:0,color:"#22c55e",role:"First Mate"},
-  {name:"Nami",emoji:"🌊",xp:200,color:"#f59e0b",role:"Navigator"},
-  {name:"Usopp",emoji:"🎯",xp:500,color:"#84cc16",role:"Sniper"},
-  {name:"Sanji",emoji:"🦵",xp:900,color:"#eab308",role:"Cook"},
-  {name:"Chopper",emoji:"🦌",xp:1400,color:"#f43f5e",role:"Doctor"},
-  {name:"Robin",emoji:"🌸",xp:2000,color:"#8b5cf6",role:"Historian"},
-  {name:"Franky",emoji:"🤖",xp:2800,color:"#3b82f6",role:"Shipwright"},
+  {name:'Zoro',emoji:'⚔️',xp:0,color:'#22c55e',role:'First Mate'},
+  {name:'Nami',emoji:'🌊',xp:200,color:'#f59e0b',role:'Navigator'},
+  {name:'Usopp',emoji:'🎯',xp:500,color:'#84cc16',role:'Sniper'},
+  {name:'Sanji',emoji:'🦵',xp:900,color:'#eab308',role:'Cook'},
+  {name:'Chopper',emoji:'🦌',xp:1400,color:'#f43f5e',role:'Doctor'},
+  {name:'Robin',emoji:'🌸',xp:2000,color:'#8b5cf6',role:'Historian'},
+  {name:'Franky',emoji:'🤖',xp:2800,color:'#3b82f6',role:'Shipwright'},
 ];
 
-const ALL_HABITS = ["water500","yoga","posture","workout","left-8am","study-ontime",
-  "water3l","nojunk","nosugar","protein","skincare","sunscreen","sleep1130",
-  "noscreen_am","noscreen_pm","journaled"];
+const ALL_HABITS = ['water500','yoga','posture','workout','left-8am','study-ontime','water3l','nojunk','nosugar','protein','skincare','sunscreen','sleep1130','noscreen_am','noscreen_pm','journaled'];
 
-// ── Helpers ─────────────────────────────────────
+// ── Helpers ──────────────────────────────────────
 function today() { const d=new Date(); d.setHours(0,0,0,0); return d; }
 function addDays(d,n) { const r=new Date(d); r.setDate(r.getDate()+n); return r; }
 function dkey(d) { return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; }
 function dayNum(d) { return Math.round((d-START)/86400000); }
 function isWO(d) { return [2,4,6].includes(d.getDay()); }
-function fmtDate(d) { return `${WD[d.getDay()]}, ${d.getDate()} ${MS[d.getMonth()]}`; }
-function fmtShort(d) { return `${d.getDate()} ${MS[d.getMonth()]}`; }
-function fromKey(k) { const [y,m,d]=k.split("-").map(Number); return new Date(y,m,d); }
+function fmtDate(d) { return `${WDAYS[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]}`; }
+function fmtShort(d) { return `${d.getDate()} ${MONTHS[d.getMonth()]}`; }
+function fromKey(k) { const [y,m,d]=k.split('-').map(Number); return new Date(y,m,d); }
 function getRank(xp) { for(let i=RANKS.length-1;i>=0;i--) if(xp>=RANKS[i].min) return RANKS[i]; return RANKS[0]; }
-function getNextRank(xp) { return RANKS.find(r=>r.min>xp)||null; }
+function getNext(xp) { return RANKS.find(r=>r.min>xp)||null; }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-function calcXP(days,revs) {
+function calcXP() {
   let xp=0;
-  Object.values(days).forEach(dd=>Object.entries(dd?.checks||{}).forEach(([k,v])=>{if(v&&XP_MAP[k])xp+=XP_MAP[k];}));
-  (revs||[]).forEach(e=>{if(e.d1done)xp+=20;if(e.d4done)xp+=30;if(e.d7done)xp+=50;});
+  Object.values(S.days).forEach(dd=>Object.entries(dd?.checks||{}).forEach(([k,v])=>{if(v&&XP_MAP[k])xp+=XP_MAP[k];}));
+  S.revs.forEach(e=>{if(e.d1done)xp+=20;if(e.d4done)xp+=30;if(e.d7done)xp+=50;});
   return xp;
 }
 
@@ -287,582 +279,454 @@ function getScore(dd) {
   return {done,total:ALL_HABITS.length,pct:Math.round(done/ALL_HABITS.length*100)};
 }
 
-// ── CSS (injected into head) ────────────────────
+// ── DOM helpers ──────────────────────────────────
+function h(tag,attrs='',inner='') { return `<${tag}${attrs?' '+attrs:''}>${inner}</${tag}>`; }
+function div(cls,inner,extra='') { return `<div class="${cls}"${extra}>${inner}</div>`; }
 
+// ── UI State ─────────────────────────────────────
+let currentTab = 0;
+let viewDate = today();
+let revFilter = 'Today';
+let revSubj = 'Pharmacology';
+let reviewType = 'daily';
+let prevXP = calcXP();
 
-// ── Component helpers ────────────────────────────
-function CI({checked, label, xp, onClick}) {
-  return e('div', {className:'ci'+(checked?' ck':''), onClick},
-    e('div', {className:'cb'}, checked ? '✓' : ''),
-    e('span', {className:'ct'}, label),
-    xp ? e('span', {className:'xc'}, '+'+xp+'XP') : null
-  );
+const TABS = ['📅 Today','📊 Tracker','🔁 1·4·7','📋 Review','🏴‍☠️ Log'];
+
+// ── Toast ────────────────────────────────────────
+function showToast(msg) {
+  const existing = document.querySelector('.toast');
+  if(existing) existing.remove();
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 1800);
 }
 
-function Toast({msg, onDone}) {
-  useEffect(()=>{ const t=setTimeout(onDone,1800); return ()=>clearTimeout(t); },[]);
-  return e('div',{className:'toast'},msg);
+// ── Modal ─────────────────────────────────────────
+function showModal(content) {
+  const ov = document.createElement('div');
+  ov.className = 'mov'; ov.innerHTML = `<div class="modal">${content}</div>`;
+  ov.addEventListener('click', e=>{ if(e.target===ov) ov.remove(); });
+  document.body.appendChild(ov);
+  return ov;
 }
 
-function LvlUp({rank, onClose}) {
-  return e('div',{className:'mov',onClick:onClose},
-    e('div',{className:'modal',onClick:ev=>ev.stopPropagation()},
-      e('span',{className:'mem'},rank.emoji),
-      e('div',{className:'mtt'},'RANK UP!!'),
-      e('div',{className:'msb'},rank.name),
-      e('div',{className:'mbd'},`Bounty: ${rank.bounty} Berries! The World Government trembles!`),
-      e('button',{className:'mok',onClick:onClose},"YOSH! LET'S GO! 🏴‍☠️")
-    )
-  );
+// ── XP & Rank check ──────────────────────────────
+function checkRankUp() {
+  const newXP = calcXP();
+  const gained = newXP - prevXP;
+  if(gained > 0) showToast(`+${gained} XP ⚡`);
+  const oldR = getRank(prevXP), newR = getRank(newXP);
+  if(newR.name !== oldR.name && newXP > prevXP) {
+    setTimeout(()=>{
+      const m = showModal(`<span style="font-size:44px;display:block;margin-bottom:8px">${newR.emoji}</span><h2>RANK UP!!</h2><h3>${newR.name}</h3><p>Bounty: <strong>${newR.bounty} Berries!</strong></p><button onclick="this.closest('.mov').remove()">YOSH! LET'S GO! 🏴‍☠️</button>`);
+    }, 700);
+  }
+  prevXP = newXP;
 }
 
-// ── Today Page ───────────────────────────────────
-function TodayPage({state, viewDate, setViewDate, toggleCheck, setField, toggleRev, setDelId}) {
+// ── Render ───────────────────────────────────────
+function render() {
+  renderHeader();
+  renderTabs();
+  renderPages();
+  renderDots();
+  attachHandlers();
+}
+
+function renderHeader() {
+  const xp = calcXP();
+  const rank = getRank(xp);
+  const dn = dayNum(today());
+  document.getElementById('hdr-sub').textContent = `APRIL 2026 · ${dn>=0&&dn<30?`DAY ${dn+1}/30`:'VOYAGE'}`;
+  document.getElementById('bounty-val').textContent = rank.bounty + '฿';
+}
+
+function renderTabs() {
+  const rp = S.revs.filter(e=>{
+    const tk=dkey(today());
+    return (e.studyDate===tk&&!e.d1done)||(e.rev1Date===tk&&!e.d4done)||(e.rev2Date===tk&&!e.d7done);
+  }).length;
+  const labels = [...TABS];
+  if(rp>0) labels[2] = `🔁 1·4·7 (${rp})`;
+  document.getElementById('tabs').innerHTML = labels.map((l,i)=>
+    `<button class="tab${currentTab===i?' on':''}" data-tab="${i}">${l}</button>`
+  ).join('');
+}
+
+function renderDots() {
+  document.getElementById('dots').innerHTML = TABS.map((_,i)=>
+    `<button class="dot${currentTab===i?' on':''}" data-tab="${i}"></button>`
+  ).join('');
+}
+
+function renderPages() {
+  const pagesEl = document.getElementById('pages');
+  pagesEl.innerHTML = TABS.map((_,i)=>
+    `<div class="page${currentTab===i?' on':''}" id="page-${i}">${renderPage(i)}</div>`
+  ).join('');
+}
+
+function renderPage(i) {
+  if(i===0) return renderToday();
+  if(i===1) return renderTracker();
+  if(i===2) return renderRevision();
+  if(i===3) return renderReview();
+  if(i===4) return renderLog();
+  return '';
+}
+
+// ── TODAY PAGE ───────────────────────────────────
+function renderToday() {
   const key = dkey(viewDate);
-  const dd = state.days[key]||{};
+  const dd = S.days[key]||{};
   const ch = dd.checks||{};
   const dn = dayNum(viewDate);
   const wo = isWO(viewDate);
-  const isToday = dkey(viewDate)===dkey(today());
+  const isT = dkey(viewDate)===dkey(today());
   const c = id => ch[id]||false;
-  const t = id => toggleCheck(key,id);
   const {done,total,pct} = getScore(dd);
   const mDone = [c('water500'),c('yoga'),c('posture'),wo?c('workout'):true,c('left-8am')].filter(Boolean).length;
-  const revT = state.revs.filter(rv=>rv.studyDate===key||rv.rev1Date===key||rv.rev2Date===key);
 
-  return e('div',null,
-    // Date nav
-    e('div',{className:'dnav'},
-      e('button',{className:'dnav-btn',disabled:dn<=0,onClick:()=>setViewDate(d=>addDays(d,-1))},'← Prev'),
-      e('div',{className:'dnav-c'},
-        e('div',{className:'dnav-l'},fmtDate(viewDate)+(isToday?' 🔴':'')),
-        e('div',{className:'dnav-s'},`Day ${dn+1}/30 · ${pct}% done`)
-      ),
-      e('button',{className:'dnav-btn',disabled:dn>=29,onClick:()=>setViewDate(d=>addDays(d,1))},'Next →')
-    ),
+  const ci = (id,label,xp,disabled=false) => {
+    if(disabled) return `<div class="ci" style="opacity:.5"><div class="cb"></div><span class="ct">${label}</span></div>`;
+    return `<div class="ci${c(id)?' ck':''}" data-chk="${id}" data-key="${key}">
+      <div class="cb">${c(id)?'✓':''}</div>
+      <span class="ct">${label}</span>
+      ${xp?`<span class="xc">+${xp}XP</span>`:''}
+    </div>`;
+  };
 
-    // Morning
-    e('div',{className:'sc gr'},
-      e('div',{className:'sc-t'},
-        e('span',null,'🌅'),
-        e('span',{style:{color:'var(--green)'}},'Morning Routine'),
-        e('div',{className:'pm'},e('div',{className:'pmf',style:{width:`${mDone/5*100}%`,background:'var(--green)'}}))
-      ),
-      e(CI,{checked:c('water500'),label:'💧 500ml water on waking',xp:10,onClick:()=>t('water500')}),
-      e(CI,{checked:c('yoga'),label:'🌊 Yoga 20 min (Adriene)',xp:20,onClick:()=>t('yoga')}),
-      e(CI,{checked:c('posture'),label:'🧘 Posture routine 8–10 min',xp:10,onClick:()=>t('posture')}),
-      wo ? e(CI,{checked:c('workout'),label:'⚔️ Haki Training — 25 min workout',xp:30,onClick:()=>t('workout')})
-         : e('div',{className:'ci',style:{opacity:.5}},e('div',{className:'cb'}),e('span',{className:'ct'},'⚓ Rest day — no workout')),
-      e(CI,{checked:c('left-8am'),label:'🏃 Reached library by 8 AM',xp:20,onClick:()=>t('left-8am')}),
-      e('textarea',{className:'ni',rows:2,placeholder:'Morning notes…',value:dd.mn||'',onChange:ev=>setField(key,'mn',ev.target.value)})
-    ),
+  // Revisions due today
+  const revToday = S.revs.filter(rv=>rv.studyDate===key||rv.rev1Date===key||rv.rev2Date===key);
+  const revHtml = revToday.length ? `
+    <div class="sl" style="color:var(--red)">🔁 Revisions due today</div>
+    ${revToday.map(rv=>{
+      const isD7=rv.rev2Date===key,isD4=rv.rev1Date===key;
+      const type=isD7?'d7':isD4?'d4':'d1';
+      const field=isD7?'d7done':isD4?'d4done':'d1done';
+      const isDone=rv[field];
+      const label=isD7?'⚡ Day 7':isD4?'🔁 Day 4':'📖 Day 1';
+      const S2=SUBJECTS[rv.subject]||SUBJECTS['Other'];
+      return `<div class="re">
+        <div class="info">
+          <div class="top">
+            <span class="rsj" style="background:${S2.c}">${S2.em} ${rv.subject}</span>
+            <span class="rty ${type}">${label}</span>
+          </div>
+          <div style="font-size:12px;color:var(--ink);word-break:break-word">${esc(rv.text)}</div>
+        </div>
+        <div class="acts">
+          <button class="ck${isDone?' on':''}" data-revck="${rv.id}" data-field="${field}">${isDone?'✓':''}</button>
+          <button class="dl" data-del="${rv.id}">×</button>
+        </div>
+      </div>`;
+    }).join('')}` : '';
 
-    // Study
-    e('div',{className:'sc op'},
-      e('div',{className:'sc-t'},e('span',null,'⚔️'),e('span',{style:{color:'var(--red)'}},'Study Log — One Piece')),
-      e(CI,{checked:c('study-ontime'),label:'📖 Started studying by 8 AM',xp:25,onClick:()=>t('study-ontime')}),
-      e('div',{className:'sr'},e('span',{className:'slb'},'⏰ Study start time'),e('input',{className:'si',placeholder:'7:58 AM',value:dd.ss||'',onChange:ev=>setField(key,'ss',ev.target.value)})),
-      e('div',{className:'sr'},e('span',{className:'slb'},'📚 Hours studied'),e('input',{className:'si',placeholder:'e.g. 8.5',value:dd.sh||'',onChange:ev=>setField(key,'sh',ev.target.value)})),
-      e('div',{className:'sr'},e('span',{className:'slb'},'🗺️ Topics covered'),e('input',{className:'si',style:{width:'130px'},placeholder:'Pharma Ch4…',value:dd.tp||'',onChange:ev=>setField(key,'tp',ev.target.value)})),
-      revT.length>0 ? e('div',null,
-        e('div',{className:'sl',style:{color:'var(--red)'}}, '🔁 Revisions due today'),
-        ...revT.map(rv=>{
-          const isD7=rv.rev2Date===key,isD4=rv.rev1Date===key;
-          const type=isD7?'d7':isD4?'d4':'d1';
-          const field=isD7?'d7done':isD4?'d4done':'d1done';
-          const isDone=rv[field];
-          const label=isD7?'⚡ Day 7 Mastery':isD4?'🔁 Day 4 Revision':'📖 Day 1 Study';
-          const S=SUBJECTS[rv.subject]||SUBJECTS['Other'];
-          return e('div',{key:`${rv.id}-${type}`,className:'re'},
-            e('div',{className:'rl'},
-              e('div',{className:'rtp'},
-                e('span',{className:'rsj',style:{background:S.c}},`${S.em} ${rv.subject}`),
-                e('span',{className:`rty ${type}`},label)
-              ),
-              e('div',{className:'rtx'},rv.text)
-            ),
-            e('div',{className:'ra'},
-              e('button',{className:'ck'+(isDone?' on':''),onClick:()=>toggleRev(rv.id,field)},isDone?'✓':''),
-              e('button',{className:'dl',onClick:()=>setDelId(rv.id)},'×')
-            )
-          );
-        })
-      ) : null,
-      e('textarea',{className:'ni',rows:3,placeholder:'Battle notes…',value:dd.sn||'',onChange:ev=>setField(key,'sn',ev.target.value)})
-    ),
+  const todayFmt = `${dkey(viewDate)===dkey(today())?' 🔴':''}`;
 
-    // Health
-    e('div',{className:'sc hk'},
-      e('div',{className:'sc-t'},e('span',null,'🏐'),e('span',{style:{color:'var(--hk)'}},'Health — Haikyuu')),
-      e(CI,{checked:c('water3l'),label:'💧 Drank 3 litres of water',xp:10,onClick:()=>t('water3l')}),
-      e(CI,{checked:c('nojunk'),label:'🥦 No junk food today',xp:15,onClick:()=>t('nojunk')}),
-      e(CI,{checked:c('nosugar'),label:'🍬 No added sugar',xp:15,onClick:()=>t('nosugar')}),
-      e(CI,{checked:c('protein'),label:'🥚 Protein at every meal',xp:10,onClick:()=>t('protein')}),
-      e(CI,{checked:c('skincare'),label:'✨ Skincare (morning + night)',xp:5,onClick:()=>t('skincare')}),
-      e(CI,{checked:c('sunscreen'),label:'☀️ Sunscreen applied',xp:5,onClick:()=>t('sunscreen')}),
-      e(CI,{checked:c('sleep1130'),label:'🌙 In bed by 11:30 PM',xp:15,onClick:()=>t('sleep1130')}),
-      e('textarea',{className:'ni',rows:2,placeholder:'Health notes…',value:dd.hn||'',onChange:ev=>setField(key,'hn',ev.target.value)})
-    ),
+  return `
+  <div class="dnav">
+    <button id="prev-day" ${dn<=0?'disabled':''}>← Prev</button>
+    <div class="dnav-c">
+      <div class="dnav-l">${fmtDate(viewDate)}${todayFmt}</div>
+      <div class="dnav-s">Day ${dn+1}/30 · ${pct}% done</div>
+    </div>
+    <button id="next-day" ${dn>=29?'disabled':''}>Next →</button>
+  </div>
 
-    // Mental
-    e('div',{className:'sc na'},
-      e('div',{className:'sc-t'},e('span',null,'🍃'),e('span',{style:{color:'var(--orange)'}},'Chakra Check — Naruto')),
-      e('div',{className:'mr'},
-        e('span',{className:'ml'},'😊 Mood'),
-        e('input',{type:'range',min:1,max:10,value:dd.mood||5,onChange:ev=>setField(key,'mood',Number(ev.target.value)),style:{flex:1,height:'4px',accentColor:'var(--orange)'}}),
-        e('span',{className:'mv',style:{color:'var(--orange)'}},(dd.mood||5)+'/10')
-      ),
-      e('div',{className:'mr'},
-        e('span',{className:'ml'},'⚡ Energy'),
-        e('input',{type:'range',min:1,max:10,value:dd.energy||5,onChange:ev=>setField(key,'energy',Number(ev.target.value)),style:{flex:1,height:'4px',accentColor:'var(--blue)'}}),
-        e('span',{className:'mv',style:{color:'var(--blue)'}},(dd.energy||5)+'/10')
-      ),
-      e(CI,{checked:c('journaled'),label:'📝 Journaled today',xp:20,onClick:()=>t('journaled')}),
-      e('textarea',{className:'ni',rows:4,placeholder:'Journal — thoughts, feelings, wins, struggles…',value:dd.jn||'',onChange:ev=>setField(key,'jn',ev.target.value)})
-    ),
+  <div class="sc gr">
+    <div class="sc-t">🌅 <span style="color:var(--green)">Morning Routine</span>
+      <div style="flex:1;height:4px;background:var(--bd);border-radius:2px;overflow:hidden">
+        <div style="height:100%;width:${mDone/5*100}%;background:var(--green);border-radius:2px"></div>
+      </div>
+    </div>
+    ${ci('water500','💧 500ml water on waking',10)}
+    ${ci('yoga','🌊 Yoga 20 min (Adriene)',20)}
+    ${ci('posture','🧘 Posture routine 8–10 min',10)}
+    ${wo?ci('workout','⚔️ Haki Training — 25 min workout',30):ci('','⚓ Rest day — no workout',0,true)}
+    ${ci('left-8am','🏃 Reached library by 8 AM',20)}
+    <textarea rows="2" placeholder="Morning notes…" data-field="mn" data-key="${key}">${esc(dd.mn||'')}</textarea>
+  </div>
 
-    // Detox
-    e('div',{className:'sc dt'},
-      e('div',{className:'sc-t'},e('span',null,'📵'),e('span',{style:{color:'var(--purple)'}},'Digital Detox')),
-      e(CI,{checked:c('noscreen_am'),label:'📵 Zero screen first 2 hours after waking',xp:20,onClick:()=>t('noscreen_am')}),
-      e(CI,{checked:c('noscreen_pm'),label:'🌙 Zero screen 30 min before bed',xp:15,onClick:()=>t('noscreen_pm')}),
-      e('textarea',{className:'ni',rows:2,placeholder:'Detox notes…',value:dd.dn||'',onChange:ev=>setField(key,'dn',ev.target.value)})
-    ),
+  <div class="sc op">
+    <div class="sc-t">⚔️ <span style="color:var(--red)">Study Log — One Piece</span></div>
+    ${ci('study-ontime','📖 Started studying by 8 AM',25)}
+    <div class="sr"><span>⏰ Study start time</span><input type="text" placeholder="7:58 AM" value="${esc(dd.ss||'')}" data-field="ss" data-key="${key}"></div>
+    <div class="sr"><span>📚 Hours studied</span><input type="text" placeholder="e.g. 8.5" value="${esc(dd.sh||'')}" data-field="sh" data-key="${key}"></div>
+    <div class="sr"><span>🗺️ Topics covered</span><input type="text" placeholder="Pharma Ch4…" value="${esc(dd.tp||'')}" data-field="tp" data-key="${key}" style="width:130px"></div>
+    ${revHtml}
+    <textarea rows="3" placeholder="Battle notes…" data-field="sn" data-key="${key}">${esc(dd.sn||'')}</textarea>
+  </div>
 
-    // Score
-    e('div',{className:'sb'},
-      e('div',{style:{fontSize:'11px',color:'#94a3b8',marginBottom:'3px',letterSpacing:'.1em',textTransform:'uppercase'}},"Today's Battle Score"),
-      e('div',{className:'sp'},pct+'%'),
-      e('div',{className:'ss'},`${done} of ${total} habits complete`),
-      e('div',{className:'sbar'},e('div',{className:'sf',style:{width:`${pct}%`}}))
-    ),
-    e('div',{style:{height:'16px'}})
-  );
+  <div class="sc hk">
+    <div class="sc-t">🏐 <span style="color:var(--hk)">Health — Haikyuu</span></div>
+    ${ci('water3l','💧 Drank 3 litres of water',10)}
+    ${ci('nojunk','🥦 No junk food today',15)}
+    ${ci('nosugar','🍬 No added sugar',15)}
+    ${ci('protein','🥚 Protein at every meal',10)}
+    ${ci('skincare','✨ Skincare (morning + night)',5)}
+    ${ci('sunscreen','☀️ Sunscreen applied',5)}
+    ${ci('sleep1130','🌙 In bed by 11:30 PM',15)}
+    <textarea rows="2" placeholder="Health notes…" data-field="hn" data-key="${key}">${esc(dd.hn||'')}</textarea>
+  </div>
+
+  <div class="sc na">
+    <div class="sc-t">🍃 <span style="color:var(--orange)">Chakra Check — Naruto</span></div>
+    <div class="mr">
+      <span class="ml">😊 Mood</span>
+      <input type="range" min="1" max="10" value="${dd.mood||5}" data-field="mood" data-key="${key}" data-num="1" style="accent-color:var(--orange)">
+      <span class="mv" id="mood-val" style="color:var(--orange)">${dd.mood||5}/10</span>
+    </div>
+    <div class="mr">
+      <span class="ml">⚡ Energy</span>
+      <input type="range" min="1" max="10" value="${dd.energy||5}" data-field="energy" data-key="${key}" data-num="1" style="accent-color:var(--blue)">
+      <span class="mv" id="energy-val" style="color:var(--blue)">${dd.energy||5}/10</span>
+    </div>
+    ${ci('journaled','📝 Journaled today',20)}
+    <textarea rows="4" placeholder="Journal — thoughts, feelings, wins, struggles…" data-field="jn" data-key="${key}">${esc(dd.jn||'')}</textarea>
+  </div>
+
+  <div class="sc dt">
+    <div class="sc-t">📵 <span style="color:var(--purple)">Digital Detox</span></div>
+    ${ci('noscreen_am','📵 Zero screen first 2 hours after waking',20)}
+    ${ci('noscreen_pm','🌙 Zero screen 30 min before bed',15)}
+    <textarea rows="2" placeholder="Detox notes…" data-field="dn" data-key="${key}">${esc(dd.dn||'')}</textarea>
+  </div>
+
+  <div class="sb">
+    <div style="font-size:11px;color:#94a3b8;margin-bottom:3px;letter-spacing:.1em;text-transform:uppercase">Today's Battle Score</div>
+    <div class="sp">${pct}%</div>
+    <div class="ss">${done} of ${total} habits complete</div>
+    <div class="sbar"><div class="sf" style="width:${pct}%"></div></div>
+  </div>
+  <div style="height:16px"></div>`;
 }
 
-// ── Tracker Page ─────────────────────────────────
-function TrackerPage({state}) {
+// ── TRACKER PAGE ─────────────────────────────────
+function renderTracker() {
   const TODAY=today();
-  const scores=Array.from({length:30},(_,i)=>getScore(state.days[dkey(addDays(START,i))]||{}));
+  const scores=Array.from({length:30},(_,i)=>getScore(S.days[dkey(addDays(START,i))]||{}));
   const elapsed=Math.max(1,Array.from({length:30},(_,i)=>addDays(START,i)).filter(d=>d<=TODAY).length);
   const avg=Math.round(scores.slice(0,elapsed).reduce((a,s)=>a+s.pct,0)/elapsed);
   const perfect=scores.filter((s,i)=>addDays(START,i)<=TODAY&&s.pct===100).length;
   let streak=0,sd=new Date(TODAY);
-  while(sd>=START){const{pct}=getScore(state.days[dkey(sd)]||{});if(pct===100){streak++;sd.setDate(sd.getDate()-1);}else break;}
+  while(sd>=START){const{pct}=getScore(S.days[dkey(sd)]||{});if(pct===100){streak++;sd.setDate(sd.getDate()-1);}else break;}
+
+  const gridHTML = Array.from({length:30},(_,i)=>{
+    const date=addDays(START,i);
+    const isT=dkey(date)===dkey(TODAY),isF=date>TODAY;
+    const{pct}=scores[i];
+    const cls=isT?'gt':isF?'gu':pct===100?'gf':pct>0?'gp':'gm';
+    return `<div class="gc ${cls}">${date.getDate()}${!isF&&!isT?`<span class="gcs">${pct}%</span>`:''}</div>`;
+  }).join('');
+
   const bars=[
     ['💧 Water 500ml','water500','var(--green)'],['🌊 Yoga','yoga','var(--green)'],
     ['⚔️ Workout','workout','var(--red)'],['📖 Study on time','study-ontime','var(--red)'],
     ['💧 Water 3L','water3l','var(--hk)'],['🥦 No junk','nojunk','var(--hk)'],
     ['✨ Skincare','skincare','var(--hk)'],['🌙 Sleep 11:30','sleep1130','var(--blue)'],
     ['📵 No screen AM','noscreen_am','var(--purple)'],['📝 Journaled','journaled','var(--orange)'],
-  ];
-  return e('div',null,
-    e('div',{className:'stats'},
-      e('div',{className:'stc'},e('div',{className:'stv'},streak),e('div',{className:'stl'},'🔥 Streak')),
-      e('div',{className:'stc'},e('div',{className:'stv'},avg+'%'),e('div',{className:'stl'},'📊 Avg Score')),
-      e('div',{className:'stc'},e('div',{className:'stv'},perfect),e('div',{className:'stl'},'⭐ Perfect Days'))
-    ),
-    e('div',{className:'sl',style:{color:'var(--red)'}},'📊 30-Day Grand Line Map'),
-    e('div',{className:'g30'},
-      ...Array.from({length:30},(_,i)=>{
-        const date=addDays(START,i);
-        const isT=dkey(date)===dkey(TODAY),isF=date>TODAY;
-        const{pct}=scores[i];
-        const cls=isT?'gc-today':isF?'gc-future':pct===100?'gc-full':pct>0?'gc-partial':'gc-missed';
-        return e('div',{key:i,className:`gc ${cls}`},date.getDate(),!isF&&!isT?e('span',{className:'gcs'},pct+'%'):null);
-      })
-    ),
-    e('div',{className:'leg'},
-      e('div',{className:'li'},e('div',{className:'ld',style:{background:'#22c55e'}}),'100%'),
-      e('div',{className:'li'},e('div',{className:'ld',style:{background:'#fef3c7',border:'1px solid var(--gold)'}}),'Partial'),
-      e('div',{className:'li'},e('div',{className:'ld',style:{background:'#fef2f2',border:'1px solid #fca5a5'}}),'Missed'),
-      e('div',{className:'li'},e('div',{className:'ld',style:{background:'#f5f5f0'}}),'Upcoming')
-    ),
-    e('div',{className:'sl',style:{color:'var(--hk)',marginTop:'16px'}},'🏐 Habit Consistency'),
-    ...bars.map(([lbl,id,col])=>{
-      const done=Array.from({length:30},(_,i)=>addDays(START,i)).filter(d=>d<=TODAY&&state.days[dkey(d)]?.checks?.[id]).length;
-      const pct=Math.round(done/elapsed*100);
-      return e('div',{key:id,className:'hbr'},
-        e('div',{className:'hbt'},e('span',null,lbl),e('span',{style:{color:col,fontWeight:'600'}},`${done}/${elapsed}d`)),
-        e('div',{className:'hbk'},e('div',{className:'hbf',style:{width:`${pct}%`,background:col}}))
-      );
-    }),
-    e('div',{style:{height:'16px'}})
-  );
+  ].map(([lbl,id,col])=>{
+    const done=Array.from({length:30},(_,i)=>addDays(START,i)).filter(d=>d<=TODAY&&S.days[dkey(d)]?.checks?.[id]).length;
+    const pct=Math.round(done/elapsed*100);
+    return `<div class="hbr">
+      <div class="hbt"><span>${lbl}</span><span style="color:${col};font-weight:600">${done}/${elapsed}d</span></div>
+      <div class="hbk"><div class="hbf" style="width:${pct}%;background:${col}"></div></div>
+    </div>`;
+  }).join('');
+
+  return `
+  <div class="stats">
+    <div class="stc"><div class="stv">${streak}</div><div class="stl">🔥 Streak</div></div>
+    <div class="stc"><div class="stv">${avg}%</div><div class="stl">📊 Avg Score</div></div>
+    <div class="stc"><div class="stv">${perfect}</div><div class="stl">⭐ Perfect Days</div></div>
+  </div>
+  <div class="sl" style="color:var(--red)">📊 30-Day Grand Line Map</div>
+  <div class="g30">${gridHTML}</div>
+  <div class="leg">
+    <div class="li"><div class="ld" style="background:#22c55e"></div>100%</div>
+    <div class="li"><div class="ld" style="background:#fef3c7;border:1px solid var(--gold)"></div>Partial</div>
+    <div class="li"><div class="ld" style="background:#fef2f2;border:1px solid #fca5a5"></div>Missed</div>
+    <div class="li"><div class="ld" style="background:#f5f5f0"></div>Upcoming</div>
+  </div>
+  <div class="sl" style="color:var(--hk);margin-top:16px">🏐 Habit Consistency</div>
+  ${bars}
+  <div style="height:16px"></div>`;
 }
 
-// ── Revision Page ────────────────────────────────
-function RevPage({state, revSubj, setRevSubj, revText, setRevText, revDate, setRevDate, onAdd, toggleRev, setDelId}) {
-  const [filter,setFilter]=useState('Today');
+// ── REVISION PAGE ────────────────────────────────
+function renderRevision() {
   const tk=dkey(today());
-  const mastered=state.revs.filter(rv=>rv.d1done&&rv.d4done&&rv.d7done).length;
-  const items=(()=>{
-    if(filter==='Today') return state.revs.flatMap(rv=>{
-      const out=[];
-      if(rv.studyDate===tk) out.push({rv,type:'d1',field:'d1done',isDone:rv.d1done,label:'📖 Day 1'});
-      if(rv.rev1Date===tk)  out.push({rv,type:'d4',field:'d4done',isDone:rv.d4done,label:'🔁 Day 4'});
-      if(rv.rev2Date===tk)  out.push({rv,type:'d7',field:'d7done',isDone:rv.d7done,label:'⚡ Day 7'});
-      return out;
+  const mastered=S.revs.filter(rv=>rv.d1done&&rv.d4done&&rv.d7done).length;
+
+  // Subject buttons
+  const subjBtns = Object.entries(SUBJECTS).map(([name,s])=>
+    `<button class="fb${revSubj===name?' on':''}" style="${revSubj===name?`background:${s.c};border-color:${s.c}`:''}" data-revsubj="${name}">${s.em} ${name}</button>`
+  ).join('');
+
+  // Filter buttons
+  const usedSubjs = [...new Set(S.revs.map(rv=>rv.subject))].filter(s=>SUBJECTS[s]);
+  const filterBtns = ['Today','All',...usedSubjs].map(f=>{
+    const S2=SUBJECTS[f];
+    return `<button class="fb${revFilter===f?' on':''}" style="${revFilter===f?`background:${S2?.c||'var(--red)'};border-color:${S2?.c||'var(--red)'}`:''}" data-revfilter="${f}">${f}</button>`;
+  }).join('');
+
+  // Items
+  let items=[];
+  if(revFilter==='Today') {
+    S.revs.forEach(rv=>{
+      if(rv.studyDate===tk) items.push({rv,type:'d1',field:'d1done',isDone:rv.d1done,label:'📖 Day 1'});
+      if(rv.rev1Date===tk)  items.push({rv,type:'d4',field:'d4done',isDone:rv.d4done,label:'🔁 Day 4'});
+      if(rv.rev2Date===tk)  items.push({rv,type:'d7',field:'d7done',isDone:rv.d7done,label:'⚡ Day 7'});
     });
-    if(filter==='All') return state.revs.flatMap(rv=>[
-      {rv,type:'d1',field:'d1done',isDone:rv.d1done,label:'📖 D1'},
-      {rv,type:'d4',field:'d4done',isDone:rv.d4done,label:'🔁 D4'},
-      {rv,type:'d7',field:'d7done',isDone:rv.d7done,label:'⚡ D7'},
-    ]);
-    return state.revs.filter(rv=>rv.subject===filter).flatMap(rv=>[
-      {rv,type:'d1',field:'d1done',isDone:rv.d1done,label:'📖 D1'},
-      {rv,type:'d4',field:'d4done',isDone:rv.d4done,label:'🔁 D4'},
-      {rv,type:'d7',field:'d7done',isDone:rv.d7done,label:'⚡ D7'},
-    ]);
-  })();
-  return e('div',null,
-    e('div',{className:'th op'},
-      e('div',{className:'th-t'},'🍎 Devil Fruit Mastery'),
-      e('div',{className:'th-s'},`1·4·7 · ${state.revs.length} topics · ${mastered} mastered`)
-    ),
-    e('div',{className:'rf'},
-      e('div',{className:'rt'},'+ Awaken New Ability'),
-      e('div',{style:{display:'flex',alignItems:'center',gap:'8px',marginBottom:'8px'}},
-        e('span',{style:{fontSize:'12px',color:'var(--mt)',whiteSpace:'nowrap'}},'Study date:'),
-        e('input',{type:'date',className:'di',value:revDate,onChange:ev=>setRevDate(ev.target.value)})
-      ),
-      e('div',{className:'fg'},
-        ...Object.entries(SUBJECTS).map(([name,s])=>
-          e('button',{key:name,className:'fb'+(revSubj===name?' on':''),
-            style:revSubj===name?{background:s.c,borderColor:s.c}:{},
-            onClick:()=>setRevSubj(name)},`${s.em} ${name}`)
-        )
-      ),
-      e('input',{className:'ti',placeholder:'e.g. Beta blockers — mechanism, uses, side effects',
-        value:revText,onChange:ev=>setRevText(ev.target.value),
-        onKeyDown:ev=>ev.key==='Enter'&&onAdd()}),
-      e('button',{className:'ab',disabled:!revText.trim(),onClick:onAdd},'ADD — AUTO-SCHEDULES DAY 1 · 4 · 7')
-    ),
-    e('div',{className:'fg'},
-      ...['Today','All',...Object.keys(SUBJECTS).filter(s=>state.revs.some(rv=>rv.subject===s))].map(f=>{
-        const S=SUBJECTS[f];
-        return e('button',{key:f,className:'fb'+(filter===f?' on':''),
-          style:filter===f?{background:S?.c||'var(--red)',borderColor:S?.c||'var(--red)'}:{},
-          onClick:()=>setFilter(f)},f);
-      })
-    ),
-    items.length===0 ? e('div',{className:'em'},filter==='Today'?'No revisions due today. Add above ↑':'No topics yet.') : null,
-    ...items.map(({rv,type,field,isDone,label})=>{
-      const S=SUBJECTS[rv.subject]||SUBJECTS['Other'];
-      const xpVal=type==='d7'?50:type==='d4'?30:20;
-      return e('div',{key:`${rv.id}-${type}`,className:'re'},
-        e('div',{className:'rl'},
-          e('div',{className:'rtp'},
-            e('span',{className:'rsj',style:{background:S.c}},`${S.em} ${rv.subject}`),
-            e('span',{className:`rty ${type}`},label)
-          ),
-          e('div',{className:'rtx'},rv.text),
-          type!=='d1'?e('div',{className:'rmt'},`Studied: ${fmtShort(fromKey(rv.studyDate))}`):null,
-          e('div',{className:'rxp'},`+${xpVal} Berries`)
-        ),
-        e('div',{className:'ra'},
-          e('button',{className:'ck'+(isDone?' on':''),onClick:()=>toggleRev(rv.id,field)},isDone?'✓':''),
-          e('button',{className:'dl',onClick:()=>setDelId(rv.id)},'×')
-        )
-      );
-    }),
-    e('div',{style:{height:'16px'}})
-  );
+  } else if(revFilter==='All') {
+    S.revs.forEach(rv=>{
+      items.push({rv,type:'d1',field:'d1done',isDone:rv.d1done,label:'📖 D1'});
+      items.push({rv,type:'d4',field:'d4done',isDone:rv.d4done,label:'🔁 D4'});
+      items.push({rv,type:'d7',field:'d7done',isDone:rv.d7done,label:'⚡ D7'});
+    });
+  } else {
+    S.revs.filter(rv=>rv.subject===revFilter).forEach(rv=>{
+      items.push({rv,type:'d1',field:'d1done',isDone:rv.d1done,label:'📖 D1'});
+      items.push({rv,type:'d4',field:'d4done',isDone:rv.d4done,label:'🔁 D4'});
+      items.push({rv,type:'d7',field:'d7done',isDone:rv.d7done,label:'⚡ D7'});
+    });
+  }
+
+  const itemsHTML = items.length===0
+    ? `<div class="em2">${revFilter==='Today'?'No revisions due today. Add above ↑':'No topics yet.'}</div>`
+    : items.map(({rv,type,field,isDone,label})=>{
+        const S2=SUBJECTS[rv.subject]||SUBJECTS['Other'];
+        const xpVal=type==='d7'?50:type==='d4'?30:20;
+        return `<div class="re">
+          <div class="info">
+            <div class="top">
+              <span class="rsj" style="background:${S2.c}">${S2.em} ${rv.subject}</span>
+              <span class="rty ${type}">${label}</span>
+            </div>
+            <div style="font-size:12px;color:var(--ink);margin-bottom:2px;word-break:break-word">${esc(rv.text)}</div>
+            ${type!=='d1'?`<div style="font-size:10px;color:var(--mt)">Studied: ${fmtShort(fromKey(rv.studyDate))}</div>`:''}
+            <div style="font-size:9px;color:#ffd700;font-weight:700">+${xpVal} Berries</div>
+          </div>
+          <div class="acts">
+            <button class="ck${isDone?' on':''}" data-revck="${rv.id}" data-field="${field}">${isDone?'✓':''}</button>
+            <button class="dl" data-del="${rv.id}">×</button>
+          </div>
+        </div>`;
+      }).join('');
+
+  // Default date
+  const td=today();
+  const defDate=`${td.getFullYear()}-${String(td.getMonth()+1).padStart(2,'0')}-${String(td.getDate()).padStart(2,'0')}`;
+
+  return `
+  <div class="th op">
+    <div style="font-family:'Pirata One',Georgia,serif;font-size:18px;line-height:1;margin-bottom:3px">🍎 Devil Fruit Mastery</div>
+    <div style="font-size:10px;opacity:.85">1·4·7 · ${S.revs.length} topics · ${mastered} mastered</div>
+  </div>
+  <div class="rf">
+    <div class="rt">+ Awaken New Ability</div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <span style="font-size:12px;color:var(--mt);white-space:nowrap">Study date:</span>
+      <input type="date" id="rev-date" value="${defDate}" style="flex:1;padding:7px 9px;border-radius:5px">
+    </div>
+    <div class="fg">${subjBtns}</div>
+    <input type="text" id="rev-text" placeholder="e.g. Beta blockers — mechanism, uses, side effects" style="width:100%;padding:9px 12px;border-radius:6px;font-size:13px;margin-bottom:8px">
+    <button id="add-rev" style="width:100%;padding:11px;border:none;border-radius:6px;background:var(--red);color:white;font-family:'Pirata One',Georgia,serif;font-size:15px;cursor:pointer">ADD — AUTO-SCHEDULES DAY 1 · 4 · 7</button>
+  </div>
+  <div class="fg">${filterBtns}</div>
+  ${itemsHTML}
+  <div style="height:16px"></div>`;
 }
 
-// ── Review Page ──────────────────────────────────
-function ReviewPage({state, setReview}) {
-  const [type,setType]=useState('daily');
+// ── REVIEW PAGE ──────────────────────────────────
+function renderReview() {
   const TODAY=today();
   const tk=dkey(TODAY);
-  const dd=state.days[tk]||{};
+  const dd=S.days[tk]||{};
   const elapsed=Math.max(1,Array.from({length:30},(_,i)=>addDays(START,i)).filter(d=>d<=TODAY).length);
-  const scores=Array.from({length:30},(_,i)=>getScore(state.days[dkey(addDays(START,i))]||{}));
+  const scores=Array.from({length:30},(_,i)=>getScore(S.days[dkey(addDays(START,i))]||{}));
   const avg=Math.round(scores.slice(0,elapsed).reduce((a,s)=>a+s.pct,0)/elapsed);
-  const mastered=state.revs.filter(rv=>rv.d1done&&rv.d4done&&rv.d7done).length;
-  const RQ=(qKey,label,rkey)=>e('div',{key:qKey},
-    e('div',{className:'rq'},label),
-    e('textarea',{className:'ra2',rows:3,placeholder:'Write here…',
-      value:state.rvws[rkey]?.[qKey]||'',
-      onChange:ev=>setReview(rkey,qKey,ev.target.value)})
-  );
-  const RS=(label,value)=>e('div',{className:'rstat',key:label},
-    e('span',{className:'rsl'},label),e('span',{className:'rsv'},value)
-  );
-  return e('div',null,
-    e('div',{className:'fg',style:{marginBottom:'12px'}},
-      ...['daily','weekly','15-day','30-day'].map(t=>
-        e('button',{key:t,className:'fb'+(type===t?' on':''),
-          style:type===t?{background:'var(--teal)',borderColor:'var(--teal)'}:{},
-          onClick:()=>setType(t)},t.charAt(0).toUpperCase()+t.slice(1))
-      )
-    ),
-    type==='daily'?e('div',{className:'rv'},
-      e('div',{style:{fontFamily:"'Pirata One',serif",fontSize:'16px',color:'var(--red)',marginBottom:'10px'}},`⚔️ ${fmtDate(TODAY)}`),
-      e('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'5px',marginBottom:'10px'}},
-        RS('📊 Score',getScore(dd).pct+'%'),RS('⏰ Start',dd.ss||'—'),RS('📚 Hours',dd.sh||'—'),RS('😊 Mood',(dd.mood||5)+'/10')
-      ),
-      RQ('win','⚔️ What did I conquer?',`d-${tk}`),
-      RQ('hard','🌊 What was hard?',`d-${tk}`),
-      RQ('grateful','🍃 Grateful for:',`d-${tk}`),
-      RQ('tomorrow','🎯 Tomorrow I will…',`d-${tk}`)
-    ):null,
-    type==='weekly'?e('div',null,...[1,2,3,4].map(w=>e('div',{key:w,className:'rv'},
-      e('div',{style:{fontFamily:"'Pirata One',serif",fontSize:'15px',color:'var(--teal)',marginBottom:'10px'}},`📆 Week ${w}`),
-      e('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'4px',marginBottom:'10px'}},
-        RS('📊 Avg',Math.round(Array.from({length:7},(_,i)=>addDays(START,(w-1)*7+i)).reduce((a,d)=>a+getScore(state.days[dkey(d)]||{}).pct,0)/7)+'%'),
-        RS('⏰ On-time',Array.from({length:7},(_,i)=>addDays(START,(w-1)*7+i)).filter(d=>state.days[dkey(d)]?.checks?.['study-ontime']).length+'/7'),
-        RS('⚔️ Workouts',Array.from({length:7},(_,i)=>addDays(START,(w-1)*7+i)).filter(d=>state.days[dkey(d)]?.checks?.['workout']).length+'/3'),
-        RS('🍎 Topics',state.revs.length)
-      ),
-      RQ('best','What went best?',`w-${w}`),
-      RQ('change','What needs to change?',`w-${w}`),
-      RQ('goal',"Next week's goal:",`w-${w}`)
-    ))):null,
-    type==='15-day'?e('div',{className:'rv'},
-      e('div',{style:{fontFamily:"'Pirata One',serif",fontSize:'15px',color:'var(--purple)',marginBottom:'10px'}},'🌗 15-Day Review'),
-      e('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'4px',marginBottom:'10px'}},
-        RS('📊 Avg',avg+'%'),
-        RS('⏰ On-time',Array.from({length:15},(_,i)=>addDays(START,i)).filter(d=>state.days[dkey(d)]?.checks?.['study-ontime']).length+'/15'),
-        RS('⚔️ Workouts',Array.from({length:15},(_,i)=>addDays(START,i)).filter(d=>state.days[dkey(d)]?.checks?.['workout']).length+''),
-        RS('🍎 Topics',state.revs.length)
-      ),
-      RQ('sticking','Best sticking habit?','r15'),
-      RQ('broken','Habit falling apart?','r15'),
-      RQ('change','Changes for 2nd half?','r15')
-    ):null,
-    type==='30-day'?e('div',{className:'rv'},
-      e('div',{style:{fontFamily:"'Pirata One',serif",fontSize:'17px',color:'var(--red)',marginBottom:'10px'}},'🏴‍☠️ Month-End Reckoning'),
-      e('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'4px',marginBottom:'10px'}},
-        RS('📊 Avg',avg+'%'),RS('⭐ Perfect',scores.filter((s,i)=>addDays(START,i)<=TODAY&&s.pct===100).length+'d'),
-        RS('🍎 Topics',state.revs.length),RS('⚡ Mastered',mastered)
-      ),
-      RQ('proud','⚔️ Most proud of?','r30'),
-      RQ('neet','📚 NEET prep how did it go?','r30'),
-      RQ('body','💪 Physical changes?','r30'),
-      RQ('island','🗺️ What island did you conquer?','r30'),
-      RQ('may','🎯 Changes for May?','r30')
-    ):null,
-    e('div',{style:{height:'16px'}})
-  );
+  const mastered=S.revs.filter(rv=>rv.d1done&&rv.d4done&&rv.d7done).length;
+
+  const typeBtns=['daily','weekly','15-day','30-day'].map(t=>
+    `<button class="fb${reviewType===t?' on':''}" style="${reviewType===t?'background:var(--teal);border-color:var(--teal)':''}" data-revtype="${t}">${t.charAt(0).toUpperCase()+t.slice(1)}</button>`
+  ).join('');
+
+  const ta=(rkey,qkey,label)=>`<div><div class="rq">${label}</div><textarea rows="3" placeholder="Write here…" data-rvkey="${rkey}" data-rvq="${qkey}" style="width:100%;padding:8px 10px;border-radius:5px;font-size:12px;min-height:55px;resize:none;outline:none;background:var(--c2);border:1.5px solid var(--bd);font-family:inherit">${esc(S.rvws[rkey]?.[qkey]||'')}</textarea></div>`;
+  const rs=(l,v)=>`<div class="rstat"><span style="font-size:12px;color:var(--mt)">${l}</span><span style="font-family:'Pirata One',Georgia,serif;font-size:16px;color:var(--red)">${v}</span></div>`;
+
+  let content='';
+  if(reviewType==='daily') {
+    content=`<div class="rv">
+      <div style="font-family:'Pirata One',Georgia,serif;font-size:16px;color:var(--red);margin-bottom:10px">⚔️ ${fmtDate(TODAY)}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:10px">
+        ${rs('📊 Score',getScore(dd).pct+'%')}${rs('⏰ Start',dd.ss||'—')}${rs('📚 Hours',dd.sh||'—')}${rs('😊 Mood',(dd.mood||5)+'/10')}
+      </div>
+      ${ta(`d-${tk}`,'win','⚔️ What did I conquer today?')}
+      ${ta(`d-${tk}`,'hard','🌊 What was hard?')}
+      ${ta(`d-${tk}`,'grateful','🍃 Grateful for:')}
+      ${ta(`d-${tk}`,'tomorrow','🎯 Tomorrow I will…')}
+    </div>`;
+  } else if(reviewType==='weekly') {
+    content=[1,2,3,4].map(w=>{
+      const wd=Array.from({length:7},(_,i)=>addDays(START,(w-1)*7+i));
+      const wa=Math.round(wd.reduce((a,d)=>a+getScore(S.days[dkey(d)]||{}).pct,0)/7);
+      const wt=wd.filter(d=>S.days[dkey(d)]?.checks?.['study-ontime']).length;
+      const ww=wd.filter(d=>S.days[dkey(d)]?.checks?.['workout']).length;
+      return `<div class="rv">
+        <div style="font-family:'Pirata One',Georgia,serif;font-size:15px;color:var(--teal);margin-bottom:10px">📆 Week ${w}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:10px">
+          ${rs('📊 Avg',wa+'%')}${rs('⏰ On-time',wt+'/7')}${rs('⚔️ Workouts',ww+'/3')}${rs('🍎 Topics',S.revs.length)}
+        </div>
+        ${ta(`w-${w}`,'best','What went best?')}
+        ${ta(`w-${w}`,'change','What needs to change?')}
+        ${ta(`w-${w}`,'goal',"Next week's goal:")}
+      </div>`;
+    }).join('');
+  } else if(reviewType==='15-day') {
+    const ot=Array.from({length:15},(_,i)=>addDays(START,i)).filter(d=>S.days[dkey(d)]?.checks?.['study-ontime']).length;
+    const wk=Array.from({length:15},(_,i)=>addDays(START,i)).filter(d=>S.days[dkey(d)]?.checks?.['workout']).length;
+    content=`<div class="rv">
+      <div style="font-family:'Pirata One',Georgia,serif;font-size:15px;color:var(--purple);margin-bottom:10px">🌗 15-Day Review</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:10px">
+        ${rs('📊 Avg',avg+'%')}${rs('⏰ On-time',ot+'/15')}${rs('⚔️ Workouts',wk+'')}${rs('🍎 Topics',S.revs.length)}
+      </div>
+      ${ta('r15','sticking','Best sticking habit?')}
+      ${ta('r15','broken','Habit falling apart?')}
+      ${ta('r15','change','Changes for 2nd half?')}
+    </div>`;
+  } else {
+    content=`<div class="rv">
+      <div style="font-family:'Pirata One',Georgia,serif;font-size:17px;color:var(--red);margin-bottom:10px">🏴‍☠️ Month-End Reckoning</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:10px">
+        ${rs('📊 Avg',avg+'%')}${rs('⭐ Perfect',scores.filter((s,i)=>addDays(START,i)<=TODAY&&s.pct===100).length+'d')}
+        ${rs('🍎 Topics',S.revs.length)}${rs('⚡ Mastered',mastered)}
+      </div>
+      ${ta('r30','proud','⚔️ Most proud of?')}
+      ${ta('r30','neet','📚 NEET prep?')}
+      ${ta('r30','body','💪 Physical changes?')}
+      ${ta('r30','island','🗺️ What island did you conquer?')}
+      ${ta('r30','may','🎯 Changes for May?')}
+    </div>`;
+  }
+
+  return `<div class="fg" style="margin-bottom:12px">${typeBtns}</div>${content}<div style="height:16px"></div>`;
 }
 
-// ── Log Page ─────────────────────────────────────
-function LogPage({xp,rank,nextRank,xpPct,state}) {
-  let streak=0,sd=new Date(today());
-  while(sd>=START){const{pct}=getScore(state.days[dkey(sd)]||{});if(pct===100){streak++;sd.setDate(sd.getDate()-1);}else break;}
-  const xpToNext=nextRank?nextRank.min-xp:0;
-  return e('div',null,
-    e('div',{className:'wanted'},
-      e('div',{className:'wt'},'— WANTED —'),
-      e('div',{style:{fontSize:'50px',margin:'6px 0',lineHeight:1}},'🏴‍☠️'),
-      e('div',{className:'wt'},'MONKEY D. LUFFY'),
-      e('div',{className:'wr'},rank.name),
-      e('div',{className:'wb'},rank.bounty),
-      e('div',{className:'wby'},'BERRIES'),
-      e('div',{style:{marginTop:'8px'}},
-        e('div',{className:'xl'},e('span',null,xp+' XP'),e('span',null,nextRank?`${xpToNext} XP to "${nextRank.name}"`:'MAX RANK 🏆')),
-        e('div',{className:'xbar'},e('div',{className:'xf',style:{width:`${Math.min(100,xpPct)}%`}}))
-      )
-    ),
-    e('div',{className:'stats'},
-      e('div',{className:'stc'},e('div',{className:'stv'},streak),e('div',{className:'stl'},'🔥 Streak')),
-      e('div',{className:'stc'},e('div',{className:'stv'},xp),e('div',{className:'stl'},'⚡ XP')),
-      e('div',{className:'stc'},e('div',{className:'stv'},Math.max(0,dayNum(today())+1)+'/30'),e('div',{className:'stl'},'⚓ Day'))
-    ),
-    e('div',{className:'sl',style:{color:'var(--red)'}},'Your Crew'),
-    e('div',{className:'cg'},
-      ...CREW.map(c=>e('div',{key:c.name,className:'cc'+(xp>=c.xp?'':' lk'),style:xp>=c.xp?{borderColor:c.color}:{}},
-        e('div',{style:{fontSize:'24px',lineHeight:1,marginBottom:'4px'}},c.emoji),
-        e('div',{style:{fontFamily:"'Pirata One',serif",fontSize:'14px',marginBottom:'1px',color:xp>=c.xp?c.color:''}},c.name),
-        e('div',{style:{fontSize:'9px',letterSpacing:'.08em',textTransform:'uppercase',color:'var(--mt)'}},xp>=c.xp?c.role:`${c.xp} XP`)
-      ))
-    ),
-    e('div',{className:'sl',style:{color:'var(--red)'}},'⚓ Pirate Code'),
-    ...[
-      ['⚓','500ml water on waking','Before phone. Before anything.'],
-      ['🥩','Protein at every meal','Eggs, dal, sprouts.'],
-      ['🏝️','Post-lunch walk 10–15 min','Kills brain fog.'],
-      ['🧘','Never skip yoga + posture','10 min even on worst days.'],
-      ['🌙','Sleep by 11:30 PM','Fat loss + NEET memory.'],
-      ['📵','No screen first 2 hours','BDNF peaks — protect this.'],
-    ].map(([em,t,b])=>e('div',{key:t,className:'cc2'},
-      e('span',{style:{fontSize:'18px',flexShrink:0}},em),
-      e('div',null,
-        e('div',{style:{fontSize:'12px',fontWeight:'600',color:'var(--navy)',marginBottom:'1px'}},t),
-        e('div',{style:{fontSize:'11px',color:'var(--mt)'}},b)
-      )
-    )),
-    e('div',{style:{height:'16px'}})
-  );
-}
-
-// ── Swipe Container ──────────────────────────────
-function SwipeContainer({tabIdx,setTabIdx,children}) {
-  const ref=useRef(null);
-  const startX=useRef(null);
-  const startY=useRef(null);
-  const lock=useRef(null);
-  const n=React.Children.count(children);
-  
-  const onTouchStart=ev=>{startX.current=ev.touches[0].clientX;startY.current=ev.touches[0].clientY;lock.current=null;};
-  const onTouchEnd=ev=>{
-    if(lock.current!=='h'||!startX.current){startX.current=null;return;}
-    const dx=ev.changedTouches[0].clientX-startX.current;
-    if(Math.abs(dx)>50){if(dx<0)setTabIdx(i=>Math.min(n-1,i+1));else setTabIdx(i=>Math.max(0,i-1));}
-    startX.current=null;lock.current=null;
-  };
-  
-  useEffect(()=>{
-    const el=ref.current;
-    if(!el) return;
-    const onMove=ev=>{
-      if(!startX.current) return;
-      const dx=ev.touches[0].clientX-startX.current;
-      const dy=ev.touches[0].clientY-startY.current;
-      if(!lock.current&&(Math.abs(dx)>8||Math.abs(dy)>8)) lock.current=Math.abs(dx)>Math.abs(dy)?'h':'v';
-      if(lock.current==='h') ev.preventDefault();
-    };
-    el.addEventListener('touchmove',onMove,{passive:false});
-    return ()=>el.removeEventListener('touchmove',onMove);
-  },[]);
-
-  return e('div',{className:'swc',ref,onTouchStart,onTouchEnd},
-    e('div',{className:'swt',style:{transform:`translateX(-${tabIdx*100}%)`}},
-      ...React.Children.map(children,child=>e('div',{className:'swp'},child))
-    )
-  );
-}
-
-// ── Main App ─────────────────────────────────────
-function App() {
-  const [state,setState]=useState(()=>loadData());
-  const [tabIdx,setTabIdx]=useState(0);
-  const [toast,setToast]=useState(null);
-  const [lvlUp,setLvlUp]=useState(null);
-  const [delId,setDelId]=useState(null);
-  const [viewDate,setViewDate]=useState(()=>today());
-  const [revSubj,setRevSubj]=useState('Pharmacology');
-  const [revText,setRevText]=useState('');
-  const [revDate,setRevDate]=useState(()=>{const d=today();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;});
-  const timer=useRef(null);
-  const prevXP=useRef(calcXP(state.days,state.revs));
-
-  const persist=useCallback(s=>{
-    if(timer.current)clearTimeout(timer.current);
-    timer.current=setTimeout(()=>saveData(s),500);
-  },[]);
-
-  const checkRank=useCallback((newState)=>{
-    const nx=calcXP(newState.days,newState.revs);
-    const g=nx-prevXP.current;
-    const or=getRank(prevXP.current),nr=getRank(nx);
-    if(g>0)setToast(`+${g} XP ⚡`);
-    if(nr.name!==or.name&&nx>prevXP.current)setTimeout(()=>setLvlUp(nr),700);
-    prevXP.current=nx;
-  },[]);
-
-  const update=useCallback(fn=>{
-    setState(prev=>{const next=fn(prev);persist(next);checkRank(next);return next;});
-  },[persist,checkRank]);
-
-  const toggleCheck=useCallback((key,id)=>update(s=>{
-    const dd=s.days[key]||{};
-    const checks={...(dd.checks||{}),[id]:!(dd.checks?.[id])};
-    return {...s,days:{...s.days,[key]:{...dd,checks}}};
-  }),[update]);
-
-  const setField=useCallback((key,f,v)=>update(s=>({
-    ...s,days:{...s.days,[key]:{...(s.days[key]||{}),[f]:v}}
-  })),[update]);
-
-  const addRev=useCallback(()=>{
-    if(!revText.trim())return;
-    const[y,m,d]=revDate.split('-').map(Number);
-    const sd=new Date(y,m-1,d);sd.setHours(0,0,0,0);
-    const entry={id:state.nid,text:revText.trim(),subject:revSubj,
-      studyDate:dkey(sd),rev1Date:dkey(addDays(sd,3)),rev2Date:dkey(addDays(sd,6)),
-      d1done:false,d4done:false,d7done:false,addedAt:Date.now()};
-    update(s=>({...s,revs:[...s.revs,entry],nid:s.nid+1}));
-    setRevText('');setToast('🍎 Devil Fruit awakened! +20 XP');
-  },[revText,revSubj,revDate,state.nid,update]);
-
-  const toggleRev=useCallback((id,field)=>update(s=>({
-    ...s,revs:s.revs.map(rv=>rv.id===id?{...rv,[field]:!rv[field]}:rv)
-  })),[update]);
-
-  const deleteRev=useCallback(id=>{update(s=>({...s,revs:s.revs.filter(rv=>rv.id!==id)}));setDelId(null);},[update]);
-  const setReview=useCallback((rk,qk,v)=>update(s=>({...s,rvws:{...s.rvws,[rk]:{...(s.rvws[rk]||{}),[qk]:v}}})),[update]);
-
-  const goToTab=useCallback(i=>{
-    setTabIdx(i);
-    document.getElementById(`tab-${i}`)?.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
-  },[]);
-
-  const xp=calcXP(state.days,state.revs);
+// ── LOG PAGE ─────────────────────────────────────
+function renderLog() {
+  const xp=calcXP();
   const rank=getRank(xp);
-  const nextRank=getNextRank(xp);
-  const xpPct=nextRank?(xp-rank.min)/(nextRank.min-rank.min)*100:100;
-  const tk=dkey(today());
-  const rp=state.revs.filter(rv=>(rv.studyDate===tk&&!rv.d1done)||(rv.rev1Date===tk&&!rv.d4done)||(rv.rev2Date===tk&&!rv.d7done)).length;
+  const next=getNext(xp);
+  const pct=next?(xp-rank.min)/(next.min-rank.min)*100:100;
+  let streak=0,sd=new Date(today());
+  while(sd>=START){const{pct:p}=getScore(S.days[dkey(sd)]||{});if(p===100){streak++;sd.setDate(sd.getDate()-1);}else break;}
 
-  const TABS=[
-    {label:'📅 Today'},
-    {label:'📊 Tracker'},
-    {label:`🔁 1·4·7${rp>0?` (${rp})`:''}`},
-    {label:'📋 Review'},
-    {label:'🏴‍☠️ Log'},
-  ];
-
-  const shared={state,toggleCheck,setField,toggleRev,setDelId,setReview};
-
-  return e('div',{className:'app'},
-    // Header
-    e('div',{className:'hdr'},
-      e('div',null,
-        e('div',{className:'ht'},'JARVIS 30-DAY'),
-        e('div',{className:'hs'},`APRIL 2026 · ${dayNum(today())>=0&&dayNum(today())<30?'DAY '+(dayNum(today())+1)+'/30':'VOYAGE'}`)
-      ),
-      e('div',{className:'hb'},e('div',{className:'hbl'},'BOUNTY'),e('div',{className:'hbv'},rank.bounty+'฿'))
-    ),
-    // Tabs
-    e('div',{className:'tabs'},
-      ...TABS.map((t,i)=>e('button',{key:i,id:`tab-${i}`,className:'tab'+(tabIdx===i?' on':''),onClick:()=>goToTab(i)},t.label))
-    ),
-    // Swipe pages
-    e(SwipeContainer,{tabIdx,setTabIdx:goToTab},
-      e(TodayPage,{...shared,viewDate,setViewDate}),
-      e(TrackerPage,{state}),
-      e(RevPage,{...shared,revSubj,setRevSubj,revText,setRevText,revDate,setRevDate,onAdd:addRev}),
-      e(ReviewPage,{...shared}),
-      e(LogPage,{xp,rank,nextRank,xpPct,state})
-    ),
-    // Dots
-    e('div',{className:'dots'},
-      ...TABS.map((_,i)=>e('div',{key:i,className:'dot'+(tabIdx===i?' on':''),onClick:()=>goToTab(i)}))
-    ),
-    // Toast
-    toast?e(Toast,{msg:toast,onDone:()=>setToast(null)}):null,
-    // Level up
-    lvlUp?e(LvlUp,{rank:lvlUp,onClose:()=>setLvlUp(null)}):null,
-    // Delete confirm
-    delId?e('div',{className:'mov',onClick:()=>setDelId(null)},
-      e('div',{className:'modal',onClick:ev=>ev.stopPropagation()},
-        e('span',{className:'mem'},'⚠️'),
-        e('div',{className:'mtt'},'Abandon Ability?'),
-        e('div',{className:'mbd'},'Removes topic and all 3 revisions.'),
-        e('div',{className:'mbr'},
-          e('button',{className:'mbt s',onClick:()=>setDelId(null)},'Cancel'),
-          e('button',{className:'mbt p',onClick:()=>deleteRev(delId)},'Delete')
-        )
-      )
-    ):null
-  );
-}
-
-// Mount
-ReactDOM.createRoot(document.getElementById('root')).render(e(App));
-
-</script>
-</body>
-</html>
+  const crewHTML=CREW.map(c=>`
+    <div class="cc${xp>=c.xp?'':' lk'}" style="${xp>=c.xp?`border-color:${c.color}`:''}">
+      <div style="font-size:24px;line-height:1;margin-bottom:4px">${c.emoji}</div>
+      <div style="font-family:'Pirata One',Georgia,serif;font-size:14px;margin-bottom:1px;color:${xp>=c.xp?c.color:''}">${c.name}</div>
+      <div style="font-size:9px;letter-spacing:.08em;te
