@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+se<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -729,4 +729,177 @@ function renderLog() {
     <div class="cc${xp>=c.xp?'':' lk'}" style="${xp>=c.xp?`border-color:${c.color}`:''}">
       <div style="font-size:24px;line-height:1;margin-bottom:4px">${c.emoji}</div>
       <div style="font-family:'Pirata One',Georgia,serif;font-size:14px;margin-bottom:1px;color:${xp>=c.xp?c.color:''}">${c.name}</div>
-      <div style="font-size:9px;letter-spacing:.08em;te
+      <div style="font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--mt)">${xp>=c.xp?c.role:`${c.xp} XP`}</div>
+    </div>`).join('');
+
+  const codeHTML=[
+    ['⚓','500ml water on waking','Before phone. Before anything.'],
+    ['🥩','Protein at every meal','Eggs, dal, sprouts.'],
+    ['🏝️','Post-lunch walk 10–15 min','Kills brain fog.'],
+    ['🧘','Never skip yoga + posture','10 min even on worst days.'],
+    ['🌙','Sleep by 11:30 PM','Fat loss + NEET memory.'],
+    ['📵','No screen first 2 hours','BDNF peaks — protect this.'],
+  ].map(([em,t,b])=>`<div class="cc2"><span style="font-size:18px;flex-shrink:0">${em}</span><div><div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:1px">${t}</div><div style="font-size:11px;color:var(--mt)">${b}</div></div></div>`).join('');
+
+  return `
+  <div class="wanted">
+    <div class="wt">— WANTED —</div>
+    <div style="font-size:50px;margin:6px 0;line-height:1">🏴‍☠️</div>
+    <div class="wt">MONKEY D. LUFFY</div>
+    <div class="wr">${rank.name}</div>
+    <div class="wb">${rank.bounty}</div>
+    <div class="wby">BERRIES</div>
+    <div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--mt);margin-bottom:4px">
+        <span>${xp} XP</span><span>${next?`${next.min-xp} XP to "${next.name}"`:'MAX RANK 🏆'}</span>
+      </div>
+      <div class="xbar"><div class="xf" style="width:${Math.min(100,pct)}%"></div></div>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="stc"><div class="stv">${streak}</div><div class="stl">🔥 Streak</div></div>
+    <div class="stc"><div class="stv">${xp}</div><div class="stl">⚡ XP</div></div>
+    <div class="stc"><div class="stv">${Math.max(0,dayNum(today())+1)}/30</div><div class="stl">⚓ Day</div></div>
+  </div>
+  <div class="sl" style="color:var(--red)">Your Crew</div>
+  <div class="cg">${crewHTML}</div>
+  <div class="sl" style="color:var(--red)">⚓ Pirate Code</div>
+  ${codeHTML}
+  <div style="height:16px"></div>`;
+}
+
+// ── Event Handlers ────────────────────────────────
+function attachHandlers() {
+  // Tab switching
+  document.getElementById('tabs').addEventListener('click', e=>{
+    const tab = e.target.closest('[data-tab]');
+    if(tab){ currentTab=+tab.dataset.tab; render(); }
+  });
+  document.getElementById('dots').addEventListener('click', e=>{
+    const dot = e.target.closest('[data-tab]');
+    if(dot){ currentTab=+dot.dataset.tab; render(); }
+  });
+
+  // Date navigation
+  const prev=document.getElementById('prev-day');
+  const next=document.getElementById('next-day');
+  if(prev) prev.addEventListener('click',()=>{ viewDate=addDays(viewDate,-1); rerenderPage(0); });
+  if(next) next.addEventListener('click',()=>{ viewDate=addDays(viewDate,1); rerenderPage(0); });
+
+  // Checkboxes
+  document.addEventListener('click', e=>{
+    const ci = e.target.closest('[data-chk]');
+    if(ci){
+      const key=ci.dataset.key, id=ci.dataset.chk;
+      if(!S.days[key]) S.days[key]={};
+      if(!S.days[key].checks) S.days[key].checks={};
+      S.days[key].checks[id] = !S.days[key].checks[id];
+      save(); checkRankUp(); rerenderPage(0);
+    }
+  });
+
+  // Revision checkboxes
+  document.addEventListener('click', e=>{
+    const ck = e.target.closest('[data-revck]');
+    if(ck){
+      const id=+ck.dataset.revck, field=ck.dataset.field;
+      const rv=S.revs.find(r=>r.id===id);
+      if(rv){ rv[field]=!rv[field]; save(); checkRankUp(); rerenderPage(currentTab); }
+    }
+    // Delete revision
+    const dl = e.target.closest('[data-del]');
+    if(dl){
+      const id=+dl.dataset.del;
+      const m=showModal(`<h2>Abandon Ability?</h2><p>Removes topic and all 3 revisions.</p><div class="mbr"><button class="s" onclick="this.closest('.mov').remove()">Cancel</button><button class="p" id="confirm-del">Delete</button></div>`);
+      m.querySelector('#confirm-del').addEventListener('click',()=>{ S.revs=S.revs.filter(r=>r.id!==id); save(); m.remove(); rerenderPage(currentTab); });
+    }
+  });
+
+  // Subject filter buttons (revision)
+  document.addEventListener('click', e=>{
+    const rsb=e.target.closest('[data-revsubj]');
+    if(rsb){ revSubj=rsb.dataset.revsubj; rerenderPage(2); }
+    const rfb=e.target.closest('[data-revfilter]');
+    if(rfb){ revFilter=rfb.dataset.revfilter; rerenderPage(2); }
+    const rtb=e.target.closest('[data-revtype]');
+    if(rtb){ reviewType=rtb.dataset.revtype; rerenderPage(3); }
+  });
+
+  // Add revision
+  const addRevBtn=document.getElementById('add-rev');
+  if(addRevBtn) addRevBtn.addEventListener('click',()=>{
+    const text=(document.getElementById('rev-text')?.value||'').trim();
+    const dateStr=document.getElementById('rev-date')?.value||'';
+    if(!text) return;
+    const [y,m,d]=dateStr.split('-').map(Number);
+    const sd=new Date(y,m-1,d); sd.setHours(0,0,0,0);
+    S.revs.push({id:S.nid++,text,subject:revSubj,
+      studyDate:dkey(sd),rev1Date:dkey(addDays(sd,3)),rev2Date:dkey(addDays(sd,6)),
+      d1done:false,d4done:false,d7done:false,addedAt:Date.now()});
+    save(); checkRankUp(); showToast('🍎 Devil Fruit awakened! +20 XP'); rerenderPage(2);
+  });
+
+  // Textarea & input change (debounced save)
+  document.addEventListener('input', e=>{
+    const ta=e.target.closest('textarea[data-field]');
+    if(ta){
+      const key=ta.dataset.key, f=ta.dataset.field;
+      if(!S.days[key]) S.days[key]={};
+      S.days[key][f]=ta.value; save();
+    }
+    const inp=e.target.closest('input[data-field]');
+    if(inp){
+      const key=inp.dataset.key, f=inp.dataset.field;
+      if(!S.days[key]) S.days[key]={};
+      S.days[key][f]=inp.dataset.num?Number(inp.value):inp.value;
+      // Update live display for sliders
+      if(f==='mood'){ const el=document.getElementById('mood-val'); if(el)el.textContent=inp.value+'/10'; }
+      if(f==='energy'){ const el=document.getElementById('energy-val'); if(el)el.textContent=inp.value+'/10'; }
+      save();
+    }
+    // Review textarea
+    const rta=e.target.closest('textarea[data-rvkey]');
+    if(rta){
+      const rk=rta.dataset.rvkey, qk=rta.dataset.rvq;
+      if(!S.rvws[rk]) S.rvws[rk]={};
+      S.rvws[rk][qk]=rta.value; save();
+    }
+  });
+
+  // Swipe
+  attachSwipe();
+}
+
+function rerenderPage(i) {
+  const el=document.getElementById(`page-${i}`);
+  if(el){ el.innerHTML=renderPage(i); attachHandlers(); renderTabs(); renderDots(); renderHeader(); }
+}
+
+// ── Swipe navigation ──────────────────────────────
+function attachSwipe() {
+  const pages=document.getElementById('pages');
+  let sx=null,sy=null,lock=null;
+  pages.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;lock=null;},{passive:true});
+  pages.addEventListener('touchmove',e=>{
+    if(!sx)return;
+    const dx=e.touches[0].clientX-sx,dy=e.touches[0].clientY-sy;
+    if(!lock&&(Math.abs(dx)>8||Math.abs(dy)>8)) lock=Math.abs(dx)>Math.abs(dy)?'h':'v';
+    if(lock==='h') e.preventDefault();
+  },{passive:false});
+  pages.addEventListener('touchend',e=>{
+    if(lock!=='h'||!sx){sx=null;return;}
+    const dx=e.changedTouches[0].clientX-sx;
+    if(Math.abs(dx)>50){
+      if(dx<0) currentTab=Math.min(TABS.length-1,currentTab+1);
+      else currentTab=Math.max(0,currentTab-1);
+      render();
+    }
+    sx=null;lock=null;
+  },{passive:true});
+}
+
+// ── Init ─────────────────────────────────────────
+render();
+</script>
+</body>
+</html>
