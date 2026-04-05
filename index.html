@@ -1,4 +1,4 @@
-se<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -35,8 +35,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 .tab.on::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:2px;background:var(--red)}
 /* Pages */
 .pages{flex:1;overflow:hidden;position:relative}
-.page{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px;display:none}
-.page.on{display:block}
+.page{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:14px;display:none}
 /* Date nav */
 .dnav{background:var(--navy);border:2px solid #ffd700;border-radius:7px;padding:9px 13px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
 .dnav button{background:none;border:1.5px solid #ffd700;border-radius:4px;color:#ffd700;padding:5px 11px;font-size:11px;cursor:pointer;font-family:inherit}
@@ -364,7 +363,7 @@ function renderDots() {
 function renderPages() {
   const pagesEl = document.getElementById('pages');
   pagesEl.innerHTML = TABS.map((_,i)=>
-    `<div class="page${currentTab===i?' on':''}" id="page-${i}">${renderPage(i)}</div>`
+    `<div class="page" id="page-${i}" style="display:${currentTab===i?'block':'none'}">${renderPage(i)}</div>`
   ).join('');
 }
 
@@ -715,7 +714,6 @@ function renderReview() {
 
   return `<div class="fg" style="margin-bottom:12px">${typeBtns}</div>${content}<div style="height:16px"></div>`;
 }
-
 // ── LOG PAGE ─────────────────────────────────────
 function renderLog() {
   const xp=calcXP();
@@ -768,16 +766,49 @@ function renderLog() {
   <div style="height:16px"></div>`;
 }
 
+
+// ── Fast tab switch — CSS only, no re-render ─────
+function switchTab(i) {
+  // Update current tab
+  currentTab = i;
+  
+  // Switch page visibility instantly
+  document.querySelectorAll('.page').forEach((p,idx)=>{
+    p.style.display = idx===i ? 'block' : 'none';
+  });
+  
+  // Update tab bar active state
+  document.querySelectorAll('.tab').forEach((t,idx)=>{
+    t.classList.toggle('on', idx===i);
+  });
+  
+  // Update dots
+  document.querySelectorAll('.dot').forEach((d,idx)=>{
+    d.classList.toggle('on', idx===i);
+  });
+  
+  // Update header
+  renderHeader();
+  
+  // Scroll active page to top when switching
+  const activePage = document.getElementById('page-'+i);
+  if(activePage) activePage.scrollTop = 0;
+  
+  // Scroll tab into view
+  const tabEl = document.querySelectorAll('.tab')[i];
+  if(tabEl) tabEl.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+}
+
 // ── Event Handlers ────────────────────────────────
 function attachHandlers() {
   // Tab switching
   document.getElementById('tabs').addEventListener('click', e=>{
     const tab = e.target.closest('[data-tab]');
-    if(tab){ currentTab=+tab.dataset.tab; render(); }
+    if(tab){ switchTab(+tab.dataset.tab); }
   });
   document.getElementById('dots').addEventListener('click', e=>{
     const dot = e.target.closest('[data-tab]');
-    if(dot){ currentTab=+dot.dataset.tab; render(); }
+    if(dot){ switchTab(+dot.dataset.tab); }
   });
 
   // Date navigation
@@ -871,8 +902,15 @@ function attachHandlers() {
 }
 
 function rerenderPage(i) {
-  const el=document.getElementById(`page-${i}`);
-  if(el){ el.innerHTML=renderPage(i); attachHandlers(); renderTabs(); renderDots(); renderHeader(); }
+  const el=document.getElementById('page-'+i);
+  if(!el) return;
+  const scrollTop = el.scrollTop;
+  el.innerHTML = renderPage(i);
+  el.scrollTop = scrollTop;
+  attachHandlers();
+  renderTabs();
+  renderDots();
+  renderHeader();
 }
 
 // ── Swipe navigation ──────────────────────────────
@@ -892,7 +930,7 @@ function attachSwipe() {
     if(Math.abs(dx)>50){
       if(dx<0) currentTab=Math.min(TABS.length-1,currentTab+1);
       else currentTab=Math.max(0,currentTab-1);
-      render();
+      switchTab(currentTab);
     }
     sx=null;lock=null;
   },{passive:true});
