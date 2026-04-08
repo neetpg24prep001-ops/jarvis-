@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATLAS - AI Voice Agent</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1a1f3a;
+            --secondary: #ff6b35;
+            --accent: #00d9ff;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b8c1;
+            --card-bg: #242d48;
+            --input-bg: #1f2641;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--primary) 0%, #0f1419 100%);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255, 107, 53, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 217, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+            animation: gradientShift 8s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 2px solid var(--accent);
+            animation: slideDown 0.6s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        .tagline {
+            font-size: 12px;
+            color: var(--text-secondary);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Chat Container */
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding: 20px;
+            background: rgba(31, 38, 65, 0.4);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            scroll-behavior: smooth;
+        }
+
+        .chat-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-container::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 3px;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            animation: fadeInUp 0.4s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            word-wrap: break-word;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        .message.ai .message-content {
+            background: var(--card-bg);
+            border: 1px solid var(--accent);
+            color: var(--text-primary);
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, var(--secondary), #ff8c42);
+            color: #ffffff;
+            border-radius: 16px 16px 4px 16px;
+        }
+
+        .message-avatar {
+            font-size: 20px;
+            min-width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 12px 16px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                opacity: 0.5;
+                transform: translateY(0);
+            }
+            30% {
+                opacity: 1;
+                transform: translateY(-10px);
+            }
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            opacity: 0.5;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Voice Input Controls */
+        .voice-controls {
+            display: flex;
+            gap: 12px;
+            padding: 20px;
+            background: rgba(31, 38, 65, 0.4);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 12px;
+            align-items: center;
+        }
+
+        .mic-button {
+            flex: 1;
+            padding: 16px;
+            border: 2px solid var(--accent);
+            background: transparent;
+            color: var(--accent);
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mic-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--accent);
+            transition: left 0.3s ease;
+            z-index: -1;
+        }
+
+        .mic-button:hover:not(:disabled) {
+            color: var(--primary);
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+        }
+
+        .mic-button:hover:not(:disabled)::before {
+            left: 0;
+        }
+
+        .mic-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .mic-button.recording {
+            background: var(--danger);
+            border-color: var(--danger);
+            color: white;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 10px rgba(231, 76, 60, 0);
+            }
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-button {
+            width: 48px;
+            height: 48px;
+            border: 2px solid var(--text-secondary);
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-button:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
+        }
+
+        /* Status Indicator */
+        .status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px;
+            background: rgba(46, 204, 113, 0.1);
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            border-radius: 8px;
+            font-size: 12px;
+            color: var(--success);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            animation: blink 2s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50%, 100% {
+                opacity: 1;
+            }
+            25%, 75% {
+                opacity: 0.3;
+            }
+        }
+
+        /* Hidden Elements */
+        input[type="file"] {
+            display: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container {
+                padding: 12px;
+                gap: 12px;
+            }
+
+            .logo {
+                font-size: 24px;
+            }
+
+            .message-content {
+                max-width: 85%;
+                font-size: 13px;
+                padding: 10px 12px;
+            }
+
+            .voice-controls {
+                flex-direction: column;
+                padding: 16px;
+            }
+
+            .mic-button {
+                width: 100%;
+            }
+
+            .action-buttons {
+                width: 100%;
+                gap: 6px;
+            }
+
+            .icon-button {
+                flex: 1;
+                width: 100%;
+                height: 44px;
+                border-radius: 6px;
+            }
+        }
+
+        /* Loading Animation */
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 217, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Copy Feedback */
+        .copy-feedback {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            animation: slideInRight 0.3s ease, slideOutRight 0.3s ease 2.7s;
+            z-index: 999;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">⚔️ ATLAS</div>
+            <div class="tagline">Advanced Titan Learning & Advisory System</div>
+        </div>
+
+        <!-- Status -->
+        <div class="status">
+            <span class="status-dot"></span>
+            System Ready - Voice Input Active
+        </div>
+
+        <!-- Chat Messages -->
+        <div class="chat-container" id="chatContainer">
+            <div class="empty-state">
+                <div class="empty-state-icon">🎤</div>
+                <div>
+                    <div style="font-size: 16px; margin-bottom: 8px;">Welcome to ATLAS</div>
+                    <div style="font-size: 12px;">Press the mic button and speak your question</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Voice Controls -->
+        <div class="voice-controls">
+            <button class="mic-button" id="micButton">
+                <span id="micIcon">🎤</span>
+                <span id="micText">Press to Record</span>
+            </button>
+            <div class="action-buttons">
+                <button class="icon-button" id="clearButton" title="Clear chat">🗑️</button>
+                <button class="icon-button" id="settingsButton" title="Settings">⚙️</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // ATLAS - Voice AI Agent System
+        // ============================================
+
+        class ATLAS {
+            constructor() {
+                this.isRecording = false;
+                this.mediaRecorder = null;
+                this.audioChunks = [];
+                this.recognition = null;
+                this.chatHistory = [];
+                this.isSpeaking = false;
+                this.apiKey = localStorage.getItem('atlasApiKey') || '';
+                
+                this.init();
+                this.loadChatHistory();
+            }
+
+            init() {
+                // Set up elements
+                this.micButton = document.getElementById('micButton');
+                this.clearButton = document.getElementById('clearButton');
+                this.settingsButton = document.getElementById('settingsButton');
+                this.chatContainer = document.getElementById('chatContainer');
+                this.micIcon = document.getElementById('micIcon');
+                this.micText = document.getElementById('micText');
+
+                // Event listeners
+                this.micButton.addEventListener('click', () => this.toggleRecording());
+                this.clearButton.addEventListener('click', () => this.clearChat());
+                this.settingsButton.addEventListener('click', () => this.openSettings());
+
+                // Setup Web Speech API
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (SpeechRecognition) {
+                    this.recognition = new SpeechRecognition();
+                    this.recognition.continuous = false;
+                    this.recognition.interimResults = true;
+                    this.recognition.lang = 'en-US';
+
+                    this.recognition.onstart = () => {
+                        this.updateMicButton(true);
+                    };
+
+                    this.recognition.onresult = (event) => {
+                        let interimTranscript = '';
+                        for (let i = event.resultIndex; i < event.results.length; i++) {
+                            const transcript = event.results[i].transcript;
+                            if (event.results[i].isFinal) {
+                                this.handleUserInput(transcript);
+                            } else {
+                                interimTranscript += transcript;
+                            }
+                        }
+                    };
+
+                    this.recognition.onend = () => {
+                        this.updateMicButton(false);
+                    };
+
+                    this.recognition.onerror = (event) => {
+                        console.error('Speech recognition error:', event.error);
+                        this.updateMicButton(false);
+                    };
+                }
+            }
+
+            async toggleRecording() {
+                if (!this.recognition) {
+                    alert('Speech Recognition not supported in your browser');
+                    return;
+                }
+
+                if (this.isRecording) {
+                    this.recognition.stop();
+                    this.isRecording = false;
+                    this.updateMicButton(false);
+                } else {
+                    this.isRecording = true;
+                    this.recognition.start();
+                }
+            }
+
+            updateMicButton(recording) {
+                if (recording) {
+                    this.micButton.classList.add('recording');
+                    this.micIcon.textContent = '🔴';
+                    this.micText.textContent = 'Recording...';
+                } else {
+                    this.micButton.classList.remove('recording');
+                    this.micIcon.textContent = '🎤';
+                    this.micText.textContent = 'Press to Record';
+                }
+            }
+
+            async handleUserInput(text) {
+                if (!text.trim()) return;
+
+                // Add user message to chat
+                this.addMessage(text, 'user');
+                
+                // Show typing indicator
+                this.showTyping();
+
+                try {
+                    // Get response from Claude
+                    const response = await this.getClaudeResponse(text);
+                    
+                    // Remove typing indicator
+                    this.removeTyping();
+                    
+                    // Add AI response
+                    this.addMessage(response, 'ai');
+                    
+                    // Speak the response
+                    this.speak(response);
+                    
+                } catch (error) {
+                    this.removeTyping();
+                    const errorMsg = 'Sorry, I encountered an error. Please try again.';
+                    this.addMessage(errorMsg, 'ai');
+                    console.error('Error:', error);
+                }
+            }
+
+            async getClaudeResponse(userMessage) {
+                // For now, return intelligent responses without external API
+                // This can be upgraded to use Anthropic API with your key
+                
+                const responses = {
+                    'hello': 'Greetings, scholar. How may ATLAS assist your NEET PG journey today?',
+                    'time': `The current time is ${new Date().toLocaleTimeString()}. Make it count in your studies!`,
+                    'help': 'I can help you with:\n• Medical knowledge questions\n• Study motivation\n• Current information searches\n• NEET PG exam tips\n\nWhat would you like to know?',
+                    'default': `That's an interesting question. Based on your NEET PG preparation, I'd recommend focusing on high-yield topics first. What specific area would you like to explore?`
+                };
+
+                const lowerMessage = userMessage.toLowerCase();
+                for (const [key, value] of Object.entries(responses)) {
+                    if (lowerMessage.includes(key)) {
+                        return value;
+                    }
+                }
+                
+                return responses.default;
+            }
+
+            addMessage(content, role) {
+                const messageEl = document.createElement('div');
+                messageEl.className = `message ${role}`;
+                
+                const avatar = document.createElement('div');
+                avatar.className = 'message-avatar';
+                avatar.textContent = role === 'user' ? '⚡' : '⚔️';
+
+                const contentEl = document.createElement('div');
+                contentEl.className = 'message-content';
+                contentEl.textContent = content;
+                contentEl.style.cursor = 'pointer';
+                contentEl.onclick = () => this.copyToClipboard(content);
+
+                if (role === 'user') {
+                    messageEl.appendChild(contentEl);
+                    messageEl.appendChild(avatar);
+                } else {
+                    messageEl.appendChild(avatar);
+                    messageEl.appendChild(contentEl);
+                }
+
+                this.chatContainer.appendChild(messageEl);
+                this.chatContainer.scrollTop = this.chatContainer.scrollHeight;
+                
+                // Save to history
+                this.chatHistory.push({ role, content, timestamp: new Date() });
+                this.saveChatHistory();
+            }
+
+            showTyping() {
+                const typingEl = document.createElement('div');
+                typingEl.className = 'message ai';
+                typingEl.id = 'typingIndicator';
+                
+                const avatar = document.createElement('div');
+                avatar.className = 'message-avatar';
+                avatar.textContent = '⚔️';
+
+                const typing = document.createElement('div');
+                typing.className = 'typing-indicator';
+                typing.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+
+                typingEl.appendChild(avatar);
+                typingEl.appendChild(typing);
+                this.chatContainer.appendChild(typingEl);
+                this.chatContainer.scrollTop = this.chatContainer.scrollHeight;
+            }
+
+            removeTyping() {
+                const typingEl = document.getElementById('typingIndicator');
+                if (typingEl) typingEl.remove();
+            }
+
+            speak(text) {
+                // Only use Web Speech API for TTS (free, no costs)
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 1;
+                utterance.pitch = 1;
+                utterance.volume = 1;
+                
+                window.speechSynthesis.cancel(); // Cancel any ongoing speech
+                window.speechSynthesis.speak(utterance);
+            }
+
+            copyToClipboard(text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    const feedback = document.createElement('div');
+                    feedback.className = 'copy-feedback';
+                    feedback.textContent = '✓ Copied to clipboard';
+                    document.body.appendChild(feedback);
+                    setTimeout(() => feedback.remove(), 3000);
+                });
+            }
+
+            clearChat() {
+                if (confirm('Clear all chat history?')) {
+                    this.chatHistory = [];
+                    this.chatContainer.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🎤</div>
+                            <div>
+                                <div style="font-size: 16px; margin-bottom: 8px;">Welcome to ATLAS</div>
+                                <div style="font-size: 12px;">Press the mic button and speak your question</div>
+                            </div>
+                        </div>
+                    `;
+                    this.saveChatHistory();
+                }
+            }
+
+            openSettings() {
+                const apiKey = prompt('Enter your Anthropic API Key (optional for basic features):', this.apiKey);
+                if (apiKey !== null) {
+                    this.apiKey = apiKey;
+                    localStorage.setItem('atlasApiKey', apiKey);
+                    alert('Settings saved!');
+                }
+            }
+
+            saveChatHistory() {
+                localStorage.setItem('atlasChatHistory', JSON.stringify(this.chatHistory));
+            }
+
+            loadChatHistory() {
+                const saved = localStorage.getItem('atlasChatHistory');
+                if (saved) {
+                    this.chatHistory = JSON.parse(saved);
+                    // Display loaded history
+                    if (this.chatHistory.length > 0) {
+                        this.chatContainer.innerHTML = '';
+                        this.chatHistory.forEach(msg => {
+                            this.addMessage(msg.content, msg.role);
+                        });
+                    }
+                }
+            }
+        }
+
+        // Initialize ATLAS on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            new ATLAS();
+        });
+    </script>
+</body>
+</html>
