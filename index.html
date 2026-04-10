@@ -9,7 +9,7 @@
 <title>Jarvis 30-Day</title>
 <link rel="manifest" href="manifest.json">
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
 :root{
   --bg:#fef9f0;--card:#fff;--c2:#fdf5e6;--bd:#f0d9a0;
   --ink:#1a0a00;--mt:#8b6914;
@@ -17,150 +17,135 @@
   --blue:#3b82f6;--purple:#7c3aed;--orange:#ea580c;
   --green:#059669;--hk:#f97316;--teal:#0f766e;
 }
-@import url('https://fonts.googleapis.com/css2?family=Pirata+One&family=DM+Sans:wght@400;500;600&display=swap');
-html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:'DM Sans',sans-serif,system-ui;font-size:14px}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,sans-serif;font-size:14px}
 .app{display:flex;flex-direction:column;height:100vh;max-width:500px;margin:0 auto}
-/* Header */
 .hdr{background:var(--navy);border-bottom:3px solid #ffd700;padding:10px 14px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
-.ht{font-family:'Pirata One',Georgia,serif;font-size:18px;color:#ffd700;line-height:1}
+.ht{font-size:18px;font-weight:800;color:#ffd700;letter-spacing:.05em}
 .hs{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;margin-top:2px}
 .hb{background:#0f2540;border:1.5px solid #ffd700;border-radius:5px;padding:4px 10px;text-align:center}
 .hbl{font-size:7px;letter-spacing:.15em;text-transform:uppercase;color:#94a3b8}
-.hbv{font-family:'Pirata One',Georgia,serif;font-size:13px;color:#ffd700;line-height:1}
-/* Tabs */
+.hbv{font-size:13px;font-weight:800;color:#ffd700;line-height:1}
 .tabs{background:var(--card);border-bottom:2px solid var(--bd);display:flex;overflow-x:auto;flex-shrink:0;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
-.tab{padding:10px 13px;border:none;background:none;cursor:pointer;white-space:nowrap;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mt);position:relative;flex-shrink:0;font-family:inherit}
-.tab.on{color:var(--red);font-weight:600}
+.tab{padding:10px 13px;border:none;background:none;cursor:pointer;white-space:nowrap;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--mt);position:relative;flex-shrink:0;font-family:inherit;touch-action:manipulation}
+.tab.on{color:var(--red);font-weight:700}
 .tab.on::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:2px;background:var(--red)}
-/* Pages */
 .pages{flex:1;overflow:hidden;position:relative}
 .page{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding:14px;display:none}
-/* Date nav */
-.dnav{background:var(--navy);border:2px solid #ffd700;border-radius:7px;padding:9px 13px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
-.dnav button{background:none;border:1.5px solid #ffd700;border-radius:4px;color:#ffd700;padding:5px 11px;font-size:11px;cursor:pointer;font-family:inherit}
-.dnav button:disabled{opacity:.25}
-.dnav-c{text-align:center}
-.dnav-l{font-family:'Pirata One',Georgia,serif;font-size:14px;color:#ffd700}
-.dnav-s{font-size:9px;color:#94a3b8;margin-top:1px}
-/* Section cards */
-.sc{background:var(--card);border:2px solid var(--bd);border-radius:8px;padding:12px;margin-bottom:7px}
+.page.on{display:block}
+.dots{display:flex;justify-content:center;gap:6px;padding:5px 0 3px;flex-shrink:0;background:var(--bg)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--bd);cursor:pointer;border:none;touch-action:manipulation}
+.dot.on{background:var(--red);width:18px;border-radius:3px}
+/* Cards */
+.sc{background:var(--card);border:2px solid var(--bd);border-radius:8px;padding:12px;margin-bottom:8px}
 .sc.op{border-top:3px solid var(--red)}
 .sc.gr{border-top:3px solid var(--green)}
 .sc.hk{border-top:3px solid var(--hk)}
 .sc.na{border-top:3px solid var(--orange)}
 .sc.dt{border-top:3px solid var(--purple)}
-.sc-t{font-family:'Pirata One',Georgia,serif;font-size:14px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
-/* Checklist */
-.ci{display:flex;align-items:center;gap:9px;padding:9px 10px;margin-bottom:3px;background:var(--c2);border-radius:6px;cursor:pointer;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation;min-height:42px;overflow:hidden}
+.sc-t{font-size:15px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+/* Checkboxes */
+.ci{display:flex;align-items:center;gap:10px;padding:10px 11px;margin-bottom:4px;background:var(--c2);border-radius:7px;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none;min-height:44px}
 .ci.ck{background:#f0fdf4}
-.ci.ck .ct{color:var(--green);text-decoration:line-through}
-.cb{width:22px;height:22px;border-radius:5px;border:1.5px solid var(--bd);background:white;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;min-width:22px}
+.cb{width:22px;height:22px;min-width:22px;border-radius:5px;border:2px solid var(--bd);background:white;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
 .ci.ck .cb{background:#22c55e;border-color:#22c55e;color:white}
-.ct{font-size:13px;color:var(--ink);flex:1;line-height:1.3;min-width:0;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
-.xc{font-size:9px;color:var(--gold);font-weight:700;white-space:nowrap;flex-shrink:0;pointer-events:none}
+.cl{font-size:13px;color:var(--ink);flex:1;line-height:1.4;pointer-events:none}
+.ci.ck .cl{color:#15803d;text-decoration:line-through}
+.cx{font-size:10px;color:var(--gold);font-weight:700;flex-shrink:0;pointer-events:none}
 /* Inputs */
-textarea,input[type=text],input[type=date]{background:var(--c2);border:1.5px solid var(--bd);border-radius:6px;color:var(--ink);font-family:inherit;outline:none}
-textarea{width:100%;padding:8px 10px;font-size:12px;resize:none;margin-top:6px}
-textarea:focus,input:focus{border-color:var(--gold)}
-.sr{display:flex;align-items:center;gap:7px;padding:7px 10px;background:var(--c2);border-radius:6px;margin-bottom:3px;overflow:hidden}
-.sr span{font-size:12px;color:var(--ink);flex:1;min-width:0}
-.sr input{background:white;border:1.5px solid var(--bd);border-radius:5px;padding:4px 8px;color:var(--ink);font-size:12px;width:100px;max-width:100px;text-align:center;flex-shrink:0}
-/* Mood */
-.mr{display:flex;align-items:center;gap:9px;padding:8px 10px;background:var(--c2);border-radius:6px;margin-bottom:3px}
-.mr span.ml{font-size:12px;width:76px;flex-shrink:0}
-.mr span.mv{font-family:'Pirata One',Georgia,serif;font-size:15px;width:32px;text-align:center;flex-shrink:0}
-input[type=range]{flex:1;height:4px;background:var(--bd);border-radius:2px;border:none;outline:none}
-/* Score box */
-.sb{background:var(--navy);border:2px solid #ffd700;border-radius:8px;padding:14px;text-align:center;margin-bottom:7px}
-.sp{font-family:'Pirata One',Georgia,serif;font-size:38px;color:#ffd700;line-height:1;margin-bottom:4px}
-.ss{font-size:11px;color:#94a3b8}
-.sbar{height:7px;background:#2d3748;border-radius:4px;margin-top:10px;overflow:hidden}
-.sf{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--red),#ffd700);transition:width .5s}
+.ni{width:100%;background:var(--c2);border:1.5px solid var(--bd);border-radius:7px;padding:9px 11px;color:var(--ink);font-family:inherit;font-size:13px;resize:none;outline:none;margin-top:6px;display:block}
+.ni:focus{border-color:var(--gold)}
+.sr{display:flex;align-items:center;gap:8px;padding:8px 11px;background:var(--c2);border-radius:7px;margin-bottom:4px}
+.sr-l{font-size:12px;color:var(--ink);flex:1}
+.sr-i{background:white;border:1.5px solid var(--bd);border-radius:5px;padding:5px 9px;color:var(--ink);font-size:13px;width:110px;text-align:center;font-family:inherit;outline:none;flex-shrink:0}
+.sr-i:focus{border-color:var(--red)}
+/* Sliders */
+.mr{display:flex;align-items:center;gap:10px;padding:9px 11px;background:var(--c2);border-radius:7px;margin-bottom:4px}
+.mr-l{font-size:12px;width:76px;flex-shrink:0}
+.mr-v{font-size:15px;font-weight:700;width:36px;text-align:center;flex-shrink:0}
+input[type=range]{flex:1;height:5px;cursor:pointer}
+/* Score */
+.sb{background:var(--navy);border:2px solid #ffd700;border-radius:8px;padding:14px;text-align:center;margin-bottom:8px}
+.sp{font-size:40px;font-weight:900;color:#ffd700;line-height:1;margin-bottom:4px}
+.sbar{height:8px;background:#2d3748;border-radius:4px;margin-top:10px;overflow:hidden}
+.sf{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--red),#ffd700)}
+/* Date nav */
+.dnav{background:var(--navy);border:2px solid #ffd700;border-radius:7px;padding:9px 13px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.dnav button{background:none;border:1.5px solid #ffd700;border-radius:4px;color:#ffd700;padding:6px 13px;font-size:12px;cursor:pointer;font-family:inherit;touch-action:manipulation}
+.dnav button:disabled{opacity:.25;cursor:default}
+.dnav-c{text-align:center}
+.dnav-l{font-size:14px;font-weight:700;color:#ffd700}
+.dnav-s{font-size:9px;color:#94a3b8;margin-top:2px}
 /* Stats */
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:10px}
 .stc{background:var(--navy);border:2px solid #ffd700;border-radius:7px;padding:11px 8px;text-align:center}
-.stv{font-family:'Pirata One',Georgia,serif;font-size:21px;color:#ffd700;line-height:1;margin-bottom:2px}
+.stv{font-size:22px;font-weight:900;color:#ffd700;line-height:1;margin-bottom:2px}
 .stl{font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:#94a3b8}
 /* Grid */
 .g30{display:grid;grid-template-columns:repeat(6,1fr);gap:3px;margin:8px 0}
 .gc{aspect-ratio:1;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:9px;font-weight:700;border:1.5px solid transparent}
 .gc.gt{background:var(--red);color:white;border-color:#991b1b}
-.gc.gf{background:#22c55e;color:white;border-color:#16a34a}
+.gc.gf{background:#22c55e;color:white}
 .gc.gp{background:#fef3c7;color:var(--gold);border-color:var(--gold)}
 .gc.gm{background:#fef2f2;color:#fca5a5;border-color:#fca5a5}
 .gc.gu{background:#f5f5f0;color:#d4c4a0}
-.gcs{font-size:7px;display:block}
-.leg{display:flex;gap:10px;flex-wrap:wrap;margin-top:7px}
-.li{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--mt)}
-.ld{width:10px;height:10px;border-radius:2px}
 /* Habit bars */
 .hbr{margin-bottom:7px}
-.hbt{display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px}
-.hbk{height:4px;background:var(--bd);border-radius:2px;overflow:hidden}
-.hbf{height:100%;border-radius:2px;transition:width .4s}
+.hbt{display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px}
+.hbk{height:5px;background:var(--bd);border-radius:3px;overflow:hidden}
+.hbf{height:100%;border-radius:3px}
 /* Wanted */
-.wanted{background:var(--c2);border:2.5px solid #ffd700;border-radius:10px;padding:14px;margin-bottom:10px;text-align:center;box-shadow:3px 3px 0 var(--gold)}
-.wt{font-family:'Pirata One',Georgia,serif;font-size:10px;letter-spacing:.3em;color:var(--mt)}
-.wr{font-family:'Pirata One',Georgia,serif;font-size:18px;color:var(--red);margin-bottom:2px}
-.wb{font-family:'Pirata One',Georgia,serif;font-size:30px;color:var(--navy);line-height:1}
-.wby{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--mt);margin-bottom:8px}
-.xbar{height:7px;background:#f0d9a0;border-radius:4px;overflow:hidden;border:1px solid var(--gold);margin-top:4px}
-.xf{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--red),#ffd700)}
+.wanted{background:var(--c2);border:2.5px solid #ffd700;border-radius:10px;padding:16px;margin-bottom:10px;text-align:center;box-shadow:3px 3px 0 var(--gold)}
 /* Crew */
 .cg{display:grid;grid-template-columns:repeat(2,1fr);gap:5px;margin-bottom:10px}
 .cc{background:var(--card);border:2px solid var(--bd);border-radius:8px;padding:10px;text-align:center}
 .cc.lk{opacity:.35;filter:grayscale(1)}
 /* Revision */
-.rf{background:var(--card);border:2px solid var(--bd);border-radius:8px;padding:12px;margin-bottom:10px}
-.rt{font-family:'Pirata One',Georgia,serif;font-size:15px;color:var(--red);margin-bottom:10px}
-.fg{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}
-.fb{padding:4px 10px;border-radius:20px;border:1.5px solid var(--bd);background:none;color:var(--mt);font-size:11px;cursor:pointer;font-family:inherit;transition:all .15s}
+.rf{background:var(--card);border:2px solid var(--bd);border-radius:8px;padding:13px;margin-bottom:10px}
+.fg{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:9px}
+.fb{padding:5px 11px;border-radius:20px;border:1.5px solid var(--bd);background:none;color:var(--mt);font-size:11px;cursor:pointer;font-family:inherit;touch-action:manipulation}
 .fb.on{color:white;border-color:transparent}
-.re{background:var(--card);border:2px solid var(--bd);border-radius:8px;padding:11px 12px;margin-bottom:4px;display:flex;align-items:flex-start;gap:9px}
-.re .info{flex:1;min-width:0}
-.re .top{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:4px}
-.rsj{font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border-radius:3px;color:white;font-weight:600}
-.rty{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--mt)}
+.re{background:var(--card);border:2px solid var(--bd);border-radius:8px;padding:12px;margin-bottom:5px;display:flex;align-items:flex-start;gap:10px}
+.re .ri{flex:1;min-width:0}
+.re .rt2{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:5px}
+.rsj{font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:3px 8px;border-radius:3px;color:white;font-weight:600}
+.rty{font-size:9px;text-transform:uppercase;letter-spacing:.06em}
 .rty.d1{color:var(--green)}.rty.d4{color:var(--blue)}.rty.d7{color:var(--gold)}
-.re .acts{display:flex;flex-direction:column;gap:5px;flex-shrink:0}
-.ck{width:22px;height:22px;border-radius:5px;border:1.5px solid var(--bd);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px}
-.ck.on{background:#22c55e;border-color:#22c55e;color:white}
-.dl{width:20px;height:20px;border:none;background:none;color:var(--mt);cursor:pointer;font-size:16px;line-height:1}
-.em2{padding:13px;background:var(--c2);border-radius:7px;font-size:12px;color:var(--mt);text-align:center;margin-bottom:6px}
+.re .ra{display:flex;flex-direction:column;gap:5px;flex-shrink:0}
+.ck2{width:24px;height:24px;border-radius:5px;border:1.5px solid var(--bd);background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;touch-action:manipulation}
+.ck2.on{background:#22c55e;border-color:#22c55e;color:white}
+.dl{width:22px;height:22px;border:none;background:none;color:var(--mt);cursor:pointer;font-size:18px;line-height:1;touch-action:manipulation}
 /* Review */
 .rv{background:var(--card);border:2px solid var(--bd);border-radius:8px;padding:13px;margin-bottom:8px}
-.rq{font-size:12px;font-weight:600;color:var(--ink);margin:9px 0 4px}
+.rq{font-size:12px;font-weight:600;color:var(--ink);margin:10px 0 5px}
 .rq:first-child{margin-top:0}
 .rstat{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--c2);border-radius:5px;margin-bottom:3px}
 /* Misc */
-.sl{font-size:9px;letter-spacing:.22em;text-transform:uppercase;margin:14px 0 8px;color:var(--mt)}
+.sl{font-size:9px;letter-spacing:.2em;text-transform:uppercase;margin:14px 0 8px;color:var(--mt)}
 .sl:first-child{margin-top:0}
-.cc2{display:flex;gap:11px;background:var(--card);border:2px solid var(--bd);border-radius:7px;padding:10px 12px;margin-bottom:4px}
-.th{border-radius:8px;padding:12px 14px;margin-bottom:10px}
-.th.op{background:linear-gradient(135deg,#1e3a5f,#0f2540);border:2px solid #ffd700;color:#fff}
-/* Dots */
-.dots{display:flex;justify-content:center;gap:6px;padding:5px 0 3px;flex-shrink:0;background:var(--bg)}
-.dot{width:6px;height:6px;border-radius:50%;background:var(--bd);cursor:pointer;border:none;transition:all .2s}
-.dot.on{background:var(--red);width:18px;border-radius:3px}
+.em2{padding:14px;background:var(--c2);border-radius:7px;font-size:12px;color:var(--mt);text-align:center}
+.th-op{background:linear-gradient(135deg,#1e3a5f,#0f2540);border:2px solid #ffd700;color:#fff;border-radius:8px;padding:13px 15px;margin-bottom:10px}
+.cc2{display:flex;gap:12px;background:var(--card);border:2px solid var(--bd);border-radius:7px;padding:11px 13px;margin-bottom:4px}
+.leg{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.li{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--mt)}
+.ld{width:10px;height:10px;border-radius:2px}
 /* Toast */
-.toast{position:fixed;top:68px;left:50%;transform:translateX(-50%);background:var(--navy);border:2px solid #ffd700;border-radius:7px;padding:9px 18px;color:#ffd700;font-family:'Pirata One',Georgia,serif;font-size:15px;z-index:999;pointer-events:none;animation:ti .3s;white-space:nowrap}
-@keyframes ti{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.toast{position:fixed;top:70px;left:50%;transform:translateX(-50%);background:var(--navy);border:2px solid #ffd700;border-radius:7px;padding:9px 18px;color:#ffd700;font-weight:700;font-size:14px;z-index:999;pointer-events:none;white-space:nowrap;animation:tia .3s ease}
+@keyframes tia{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 /* Modal */
 .mov{position:fixed;inset:0;background:#00000099;display:flex;align-items:center;justify-content:center;z-index:1000;padding:16px}
-.modal{background:var(--c2);border:2.5px solid #ffd700;border-radius:12px;padding:20px;width:100%;max-width:360px;text-align:center;box-shadow:5px 5px 0 var(--gold)}
-.modal h2{font-family:'Pirata One',Georgia,serif;font-size:24px;color:var(--red);margin-bottom:4px}
-.modal h3{font-family:'Pirata One',Georgia,serif;font-size:16px;color:var(--navy);margin-bottom:10px}
-.modal p{font-size:12px;color:var(--mt);line-height:1.6;margin-bottom:14px}
-.modal button{padding:11px 20px;border:none;border-radius:7px;background:var(--red);color:white;font-family:'Pirata One',Georgia,serif;font-size:16px;cursor:pointer;width:100%}
-.mbr{display:flex;gap:8px;margin-top:12px}
-.mbr button{flex:1;padding:10px;border:none;border-radius:6px;font-family:'Pirata One',Georgia,serif;font-size:13px;cursor:pointer}
-.mbr button.p{background:var(--red);color:white}
-.mbr button.s{background:var(--c2);color:var(--mt);border:1.5px solid var(--bd)}
+.modal{background:var(--c2);border:2.5px solid #ffd700;border-radius:12px;padding:22px;width:100%;max-width:360px;text-align:center;box-shadow:5px 5px 0 var(--gold)}
+.modal h2{font-size:22px;font-weight:900;color:var(--red);margin-bottom:6px}
+.modal p{font-size:13px;color:var(--mt);line-height:1.6;margin-bottom:16px}
+.mbr{display:flex;gap:8px}
+.mbr button{flex:1;padding:11px;border:none;border-radius:7px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;touch-action:manipulation}
+.btn-p{background:var(--red);color:white}
+.btn-s{background:white;color:var(--mt);border:1.5px solid var(--bd) !important}
+.btn-ok{width:100%;padding:12px;border:none;border-radius:7px;background:var(--red);color:white;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;touch-action:manipulation}
 </style>
 </head>
 <body>
-<div class="app" id="app">
+<div class="app">
   <div class="hdr">
     <div>
       <div class="ht">JARVIS 30-DAY</div>
@@ -177,13 +162,11 @@ input[type=range]{flex:1;height:4px;background:var(--bd);border-radius:2px;borde
 </div>
 
 <script>
-// ═══════════════════════════════════════
-// JARVIS 30-DAY — Zero Dependencies
-// Pure HTML + CSS + Vanilla JS
-// No React. No CDN. Instant load.
-// ═══════════════════════════════════════
+// ═══════════════════════════════════════════════
+// JARVIS 30-DAY — Vanilla JS, Zero Dependencies
+// ═══════════════════════════════════════════════
 
-// ── Storage & Migration ──────────────────────────
+// ── Data ─────────────────────────────────────────
 const KEY = 'jarvis-master';
 const VER = 2;
 
@@ -192,54 +175,52 @@ function fresh() { return {version:VER,days:{},revs:[],nid:1,rvws:{}}; }
 function migrate(raw) {
   if (!raw) return fresh();
   let d; try { d = JSON.parse(raw); } catch { return fresh(); }
-  if (!d.version) d = {version:1,days:d.days||d.dayData||{},revs:d.revs||d.entries||[],nid:d.nid||d.nextId||1,rvws:d.rvws||d.reviews||{}};
+  if (!d.version) d = {version:1,days:d.days||d.dayData||{},revs:d.revs||d.entries||[],nid:d.nid||1,rvws:d.rvws||{}};
   if (d.version < 2) {
-    const sm={"Physio":"Physiology","Pharma":"Pharmacology","Patho":"Pathology","Med":"Medicine","Biochem":"Biochemistry","Micro":"Microbiology"};
-    d.revs=(d.revs||[]).map(e=>({...e,subject:sm[e.subject]||e.subject||'Other'}));
-    d.version=2;
+    const m = {Physio:'Physiology',Pharma:'Pharmacology',Patho:'Pathology',Med:'Medicine',Biochem:'Biochemistry',Micro:'Microbiology'};
+    d.revs = (d.revs||[]).map(e => ({...e, subject: m[e.subject]||e.subject||'Other'}));
+    d.version = 2;
   }
   return {version:VER,days:d.days||{},revs:d.revs||[],nid:d.nid||1,rvws:d.rvws||{}};
 }
 
-function load() { try { return migrate(localStorage.getItem(KEY)); } catch { return fresh(); } }
+let S = migrate(localStorage.getItem(KEY));
 let saveTimer;
 function save() {
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(()=>{ try{localStorage.setItem(KEY,JSON.stringify({...S,version:VER}));}catch{} },500);
+  saveTimer = setTimeout(() => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch{} }, 400);
 }
 
-// ── State ────────────────────────────────────────
-let S = load();
-
-// ── Constants ────────────────────────────────────
+// ── Constants ─────────────────────────────────────
 const START = new Date(2026,3,1);
-const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const WDAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const MN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const WD = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
-const SUBJECTS = {
-  'Physiology':{c:'#f43f5e',em:'🫀'},'Pharmacology':{c:'#8b5cf6',em:'⚗️'},
-  'Pathology':{c:'#334155',em:'🔬'},'Medicine':{c:'#0ea5e9',em:'⚕️'},
-  'PSM':{c:'#10b981',em:'📊'},'Biochemistry':{c:'#f59e0b',em:'🧬'},
-  'Microbiology':{c:'#84cc16',em:'🦠'},'Anatomy':{c:'#e11d48',em:'🦴'},
-  'FMT':{c:'#0891b2',em:'⚖️'},'Ophthalmology':{c:'#f97316',em:'👁️'},
-  'ENT':{c:'#7c3aed',em:'👂'},'Dermatology':{c:'#db2777',em:'🧴'},
-  'Anaesthesia':{c:'#64748b',em:'💉'},'Radiology':{c:'#0284c7',em:'🔭'},
-  'Psychiatry':{c:'#9333ea',em:'🧠'},'Orthopaedics':{c:'#b45309',em:'🦿'},
-  'Paediatrics':{c:'#16a34a',em:'👶'},'OBG':{c:'#be185d',em:'🌸'},
-  'Surgery':{c:'#dc2626',em:'🔪'},'Other':{c:'#6b7280',em:'📚'}
+const SUBJ = {
+  'Physiology':{c:'#f43f5e',e:'🫀'},'Pharmacology':{c:'#8b5cf6',e:'⚗️'},
+  'Pathology':{c:'#334155',e:'🔬'},'Medicine':{c:'#0ea5e9',e:'⚕️'},
+  'PSM':{c:'#10b981',e:'📊'},'Biochemistry':{c:'#f59e0b',e:'🧬'},
+  'Microbiology':{c:'#84cc16',e:'🦠'},'Anatomy':{c:'#e11d48',e:'🦴'},
+  'FMT':{c:'#0891b2',e:'⚖️'},'Ophthalmology':{c:'#f97316',e:'👁️'},
+  'ENT':{c:'#7c3aed',e:'👂'},'Dermatology':{c:'#db2777',e:'🧴'},
+  'Anaesthesia':{c:'#64748b',e:'💉'},'Radiology':{c:'#0284c7',e:'🔭'},
+  'Psychiatry':{c:'#9333ea',e:'🧠'},'Orthopaedics':{c:'#b45309',e:'🦿'},
+  'Paediatrics':{c:'#16a34a',e:'👶'},'OBG':{c:'#be185d',e:'🌸'},
+  'Surgery':{c:'#dc2626',e:'🔪'},'Other':{c:'#6b7280',e:'📚'}
 };
 
 const RANKS = [
   {name:'East Blue Rookie',min:0,bounty:'0',emoji:'📖'},
-  {name:'Pirate',min:200,bounty:'10M',emoji:'🏴‍☠️'},
-  {name:'Super Rookie',min:500,bounty:'50M',emoji:'⚡'},
-  {name:'Grand Line Capt',min:900,bounty:'150M',emoji:'🔥'},
-  {name:'New World Pirate',min:1400,bounty:'500M',emoji:'💪'},
-  {name:'Yonko Commander',min:2000,bounty:'1B',emoji:'👑'},
-  {name:'PIRATE KING',min:2800,bounty:'∞',emoji:'🏆'},
+  {name:'Pirate',min:200,bounty:'10M',emoji:'⚡'},
+  {name:'Super Rookie',min:500,bounty:'50M',emoji:'🔥'},
+  {name:'Grand Line Capt',min:900,bounty:'150M',emoji:'💪'},
+  {name:'New World Pirate',min:1400,bounty:'500M',emoji:'👑'},
+  {name:'Yonko Commander',min:2000,bounty:'1B',emoji:'🏆'},
+  {name:'PIRATE KING',min:2800,bounty:'INF',emoji:'🏆'},
 ];
 
-const XP_MAP = {water500:10,yoga:20,posture:10,workout:30,'left-8am':20,'study-ontime':25,water3l:10,nojunk:15,nosugar:15,protein:10,skincare:5,sunscreen:5,sleep1130:15,noscreen_am:20,noscreen_pm:15,journaled:20};
+const XPM = {water500:10,yoga:20,posture:10,workout:30,'left-8am':20,'study-ontime':25,water3l:10,nojunk:15,nosugar:15,protein:10,skincare:5,sunscreen:5,sleep1130:15,noscreen_am:20,noscreen_pm:15,journaled:20};
+const HABITS = Object.keys(XPM);
 
 const CREW = [
   {name:'Zoro',emoji:'⚔️',xp:0,color:'#22c55e',role:'First Mate'},
@@ -251,274 +232,262 @@ const CREW = [
   {name:'Franky',emoji:'🤖',xp:2800,color:'#3b82f6',role:'Shipwright'},
 ];
 
-const ALL_HABITS = ['water500','yoga','posture','workout','left-8am','study-ontime','water3l','nojunk','nosugar','protein','skincare','sunscreen','sleep1130','noscreen_am','noscreen_pm','journaled'];
-
-// ── Helpers ──────────────────────────────────────
-function today() { const d=new Date(); d.setHours(0,0,0,0); return d; }
-function addDays(d,n) { const r=new Date(d); r.setDate(r.getDate()+n); return r; }
-function dkey(d) { return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; }
-function dayNum(d) { return Math.round((d-START)/86400000); }
-function isWO(d) { return [2,4,6].includes(d.getDay()); }
-function fmtDate(d) { return `${WDAYS[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]}`; }
-function fmtShort(d) { return `${d.getDate()} ${MONTHS[d.getMonth()]}`; }
-function fromKey(k) { const [y,m,d]=k.split('-').map(Number); return new Date(y,m,d); }
-function getRank(xp) { for(let i=RANKS.length-1;i>=0;i--) if(xp>=RANKS[i].min) return RANKS[i]; return RANKS[0]; }
-function getNext(xp) { return RANKS.find(r=>r.min>xp)||null; }
-function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+// ── Helpers ───────────────────────────────────────
+const today = () => { const d=new Date(); d.setHours(0,0,0,0); return d; };
+const addD = (d,n) => { const r=new Date(d); r.setDate(r.getDate()+n); return r; };
+const dkey = d => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+const dayN = d => Math.round((d-START)/86400000);
+const isWO = d => [2,4,6].includes(d.getDay());
+const fmtD = d => `${WD[d.getDay()]}, ${d.getDate()} ${MN[d.getMonth()]}`;
+const fmtS = d => `${d.getDate()} ${MN[d.getMonth()]}`;
+const fromK = k => { const [y,m,d]=k.split('-').map(Number); return new Date(y,m,d); };
+const getRank = xp => { for(let i=RANKS.length-1;i>=0;i--) if(xp>=RANKS[i].min) return RANKS[i]; return RANKS[0]; };
+const getNext = xp => RANKS.find(r=>r.min>xp)||null;
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
 function calcXP() {
-  let xp=0;
-  Object.values(S.days).forEach(dd=>Object.entries(dd?.checks||{}).forEach(([k,v])=>{if(v&&XP_MAP[k])xp+=XP_MAP[k];}));
-  S.revs.forEach(e=>{if(e.d1done)xp+=20;if(e.d4done)xp+=30;if(e.d7done)xp+=50;});
-  return xp;
+  let x=0;
+  Object.values(S.days).forEach(d=>Object.entries(d?.checks||{}).forEach(([k,v])=>{if(v&&XPM[k])x+=XPM[k];}));
+  S.revs.forEach(r=>{if(r.d1done)x+=20;if(r.d4done)x+=30;if(r.d7done)x+=50;});
+  return x;
 }
 
 function getScore(dd) {
-  const done=ALL_HABITS.filter(k=>dd?.checks?.[k]).length;
-  return {done,total:ALL_HABITS.length,pct:Math.round(done/ALL_HABITS.length*100)};
+  const done=HABITS.filter(k=>dd?.checks?.[k]).length;
+  return {done,total:HABITS.length,pct:Math.round(done/HABITS.length*100)};
 }
 
-// ── DOM helpers ──────────────────────────────────
-function h(tag,attrs='',inner='') { return `<${tag}${attrs?' '+attrs:''}>${inner}</${tag}>`; }
-function div(cls,inner,extra='') { return `<div class="${cls}"${extra}>${inner}</div>`; }
-
-// ── UI State ─────────────────────────────────────
-let currentTab = 0;
-let viewDate = today();
-let revFilter = 'Today';
-let revSubj = 'Pharmacology';
-let reviewType = 'daily';
+// ── UI State ──────────────────────────────────────
+let TAB = 0;
+let VD = today();
+let RFILT = 'Today';
+let RSUBJ = 'Pharmacology';
+let RVTYPE = 'daily';
 let prevXP = calcXP();
 
-const TABS = ['📅 Today','📊 Tracker','🔁 1·4·7','📋 Review','🏴‍☠️ Log'];
+const TABS = ['📅 Today','📊 Tracker','🔁 1·4·7','📋 Review','🏴 Log'];
 
-// ── Toast ────────────────────────────────────────
-function showToast(msg) {
-  const existing = document.querySelector('.toast');
-  if(existing) existing.remove();
+// ── Toast ─────────────────────────────────────────
+function toast(msg) {
+  document.querySelector('.toast')?.remove();
   const t = document.createElement('div');
-  t.className = 'toast'; t.textContent = msg;
+  t.className='toast'; t.textContent=msg;
   document.body.appendChild(t);
-  setTimeout(()=>t.remove(), 1800);
+  setTimeout(()=>t.remove(),1800);
 }
 
 // ── Modal ─────────────────────────────────────────
-function showModal(content) {
-  const ov = document.createElement('div');
-  ov.className = 'mov'; ov.innerHTML = `<div class="modal">${content}</div>`;
-  ov.addEventListener('click', e=>{ if(e.target===ov) ov.remove(); });
-  document.body.appendChild(ov);
-  return ov;
+function modal(html) {
+  const o = document.createElement('div');
+  o.className='mov';
+  o.innerHTML=`<div class="modal">${html}</div>`;
+  o.addEventListener('click',e=>{if(e.target===o)o.remove();});
+  document.body.appendChild(o);
+  return o;
 }
 
-// ── XP & Rank check ──────────────────────────────
-function checkRankUp() {
-  const newXP = calcXP();
-  const gained = newXP - prevXP;
-  if(gained > 0) showToast(`+${gained} XP ⚡`);
-  const oldR = getRank(prevXP), newR = getRank(newXP);
-  if(newR.name !== oldR.name && newXP > prevXP) {
+// ── Rank check ────────────────────────────────────
+function checkRank() {
+  const nx=calcXP(), g=nx-prevXP;
+  if(g>0) toast(`+${g} XP`);
+  const or=getRank(prevXP), nr=getRank(nx);
+  if(nr.name!==or.name&&nx>prevXP) {
     setTimeout(()=>{
-      const m = showModal(`<span style="font-size:44px;display:block;margin-bottom:8px">${newR.emoji}</span><h2>RANK UP!!</h2><h3>${newR.name}</h3><p>Bounty: <strong>${newR.bounty} Berries!</strong></p><button onclick="this.closest('.mov').remove()">YOSH! LET'S GO! 🏴‍☠️</button>`);
-    }, 700);
+      const m=modal(`<div style="font-size:48px;margin-bottom:8px">${nr.emoji}</div>
+        <h2>RANK UP!</h2>
+        <p><strong>${nr.name}</strong><br>Bounty: ${nr.bounty} Berries!</p>
+        <button class="btn-ok" onclick="this.closest('.mov').remove()">YOSH! LET'S GO!</button>`);
+    },600);
   }
-  prevXP = newXP;
+  prevXP=nx;
 }
 
-// ── Render ───────────────────────────────────────
-function render() {
-  renderHeader();
-  renderTabs();
-  renderPages();
-  renderDots();
-  attachHandlers();
-}
-
+// ── Render header ─────────────────────────────────
 function renderHeader() {
-  const xp = calcXP();
-  const rank = getRank(xp);
-  const dn = dayNum(today());
-  document.getElementById('hdr-sub').textContent = `APRIL 2026 · ${dn>=0&&dn<30?`DAY ${dn+1}/30`:'VOYAGE'}`;
-  document.getElementById('bounty-val').textContent = rank.bounty + '฿';
+  const xp=calcXP(), rank=getRank(xp), dn=dayN(today());
+  document.getElementById('hdr-sub').textContent=`APRIL 2026 · ${dn>=0&&dn<30?`DAY ${dn+1}/30`:'VOYAGE'}`;
+  document.getElementById('bounty-val').textContent=rank.bounty+'฿';
 }
 
-function renderTabs() {
-  const rp = S.revs.filter(e=>{
-    const tk=dkey(today());
-    return (e.studyDate===tk&&!e.d1done)||(e.rev1Date===tk&&!e.d4done)||(e.rev2Date===tk&&!e.d7done);
-  }).length;
-  const labels = [...TABS];
-  if(rp>0) labels[2] = `🔁 1·4·7 (${rp})`;
-  document.getElementById('tabs').innerHTML = labels.map((l,i)=>
-    `<button class="tab${currentTab===i?' on':''}" data-tab="${i}">${l}</button>`
-  ).join('');
+// ── Switch tab (fast, no rebuild) ─────────────────
+function goTab(i) {
+  TAB=i;
+  document.querySelectorAll('.page').forEach((p,j)=>p.classList.toggle('on',j===i));
+  document.querySelectorAll('.tab').forEach((t,j)=>t.classList.toggle('on',j===i));
+  document.querySelectorAll('.dot').forEach((d,j)=>d.classList.toggle('on',j===i));
+  document.querySelectorAll('.tab')[i]?.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  renderHeader();
 }
 
-function renderDots() {
-  document.getElementById('dots').innerHTML = TABS.map((_,i)=>
-    `<button class="dot${currentTab===i?' on':''}" data-tab="${i}"></button>`
-  ).join('');
+// ── Rerender single page ──────────────────────────
+function rr(i) {
+  const el=document.getElementById('p'+i);
+  if(!el) return;
+  const st=el.scrollTop;
+  el.innerHTML=buildPage(i);
+  el.scrollTop=st;
+  renderHeader();
+  // Update tab badge
+  const rp=pendingRevs();
+  document.querySelectorAll('.tab')[2].textContent=`🔁 1·4·7${rp>0?` (${rp})`:''}`;
 }
 
-function renderPages() {
-  const pagesEl = document.getElementById('pages');
-  pagesEl.innerHTML = TABS.map((_,i)=>
-    `<div class="page" id="page-${i}" style="display:${currentTab===i?'block':'none'}">${renderPage(i)}</div>`
-  ).join('');
+function pendingRevs() {
+  const tk=dkey(today());
+  return S.revs.filter(r=>(r.studyDate===tk&&!r.d1done)||(r.rev1Date===tk&&!r.d4done)||(r.rev2Date===tk&&!r.d7done)).length;
 }
 
-function renderPage(i) {
-  if(i===0) return renderToday();
-  if(i===1) return renderTracker();
-  if(i===2) return renderRevision();
-  if(i===3) return renderReview();
-  if(i===4) return renderLog();
+// ── Full render (once on load) ────────────────────
+function fullRender() {
+  // Tabs
+  const rp=pendingRevs();
+  const labels=[...TABS]; labels[2]=`🔁 1·4·7${rp>0?` (${rp})`:''}`;
+  document.getElementById('tabs').innerHTML=labels.map((l,i)=>`<button class="tab${TAB===i?' on':''}" data-t="${i}">${l}</button>`).join('');
+  // Pages
+  document.getElementById('pages').innerHTML=TABS.map((_,i)=>`<div class="page${TAB===i?' on':''}" id="p${i}">${buildPage(i)}</div>`).join('');
+  // Dots
+  document.getElementById('dots').innerHTML=TABS.map((_,i)=>`<button class="dot${TAB===i?' on':''}" data-t="${i}"></button>`).join('');
+  renderHeader();
+}
+
+// ── Build page content ────────────────────────────
+function buildPage(i) {
+  try {
+    if(i===0) return buildToday();
+    if(i===1) return buildTracker();
+    if(i===2) return buildRevision();
+    if(i===3) return buildReview();
+    if(i===4) return buildLog();
+  } catch(e) { return `<div style="padding:20px;color:red">Error: ${e.message}</div>`; }
   return '';
 }
 
-// ── TODAY PAGE ───────────────────────────────────
-function renderToday() {
-  const key = dkey(viewDate);
-  const dd = S.days[key]||{};
-  const ch = dd.checks||{};
-  const dn = dayNum(viewDate);
-  const wo = isWO(viewDate);
-  const isT = dkey(viewDate)===dkey(today());
-  const c = id => ch[id]||false;
-  const {done,total,pct} = getScore(dd);
-  const mDone = [c('water500'),c('yoga'),c('posture'),wo?c('workout'):true,c('left-8am')].filter(Boolean).length;
+// ══════════════════════════════════════════════════
+// TODAY PAGE
+// ══════════════════════════════════════════════════
+function buildToday() {
+  const key=dkey(VD), dd=S.days[key]||{}, ch=dd.checks||{};
+  const dn=dayN(VD), wo=isWO(VD), isT=key===dkey(today());
+  const c=id=>ch[id]||false;
+  const {done,total,pct}=getScore(dd);
+  const mp=[c('water500'),c('yoga'),c('posture'),wo?c('workout'):true,c('left-8am')].filter(Boolean).length;
 
-  const ci = (id,label,xp,disabled=false) => {
-    if(disabled) return `<div class="ci" style="opacity:.5;cursor:default"><div class="cb"></div><span class="ct">${label}</span></div>`;
-    return `<div class="ci${c(id)?' ck':''}" data-chk="${id}" data-key="${key}" style="touch-action:manipulation">
-      <div class="cb" style="pointer-events:none">${c(id)?'✓':''}</div>
-      <span class="ct" style="pointer-events:none">${label}</span>
-      ${xp?`<span class="xc" style="pointer-events:none">+${xp}XP</span>`:''}
-    </div>`;
-  };
+  const ci=(id,lbl,xp,dis=false)=>dis
+    ?`<div class="ci" style="opacity:.45;cursor:default"><div class="cb"></div><span class="cl">${lbl}</span></div>`
+    :`<div class="ci${c(id)?' ck':''}" data-chk="${id}" data-key="${key}"><div class="cb">${c(id)?'✓':''}</div><span class="cl">${lbl}</span>${xp?`<span class="cx">+${xp}XP</span>`:''}</div>`;
 
-  // Revisions due today
-  const revToday = S.revs.filter(rv=>rv.studyDate===key||rv.rev1Date===key||rv.rev2Date===key);
-  const revHtml = revToday.length ? `
-    <div class="sl" style="color:var(--red)">🔁 Revisions due today</div>
-    ${revToday.map(rv=>{
-      const isD7=rv.rev2Date===key,isD4=rv.rev1Date===key;
-      const type=isD7?'d7':isD4?'d4':'d1';
-      const field=isD7?'d7done':isD4?'d4done':'d1done';
-      const isDone=rv[field];
-      const label=isD7?'⚡ Day 7':isD4?'🔁 Day 4':'📖 Day 1';
-      const S2=SUBJECTS[rv.subject]||SUBJECTS['Other'];
-      return `<div class="re">
-        <div class="info">
-          <div class="top">
-            <span class="rsj" style="background:${S2.c}">${S2.em} ${rv.subject}</span>
-            <span class="rty ${type}">${label}</span>
-          </div>
-          <div style="font-size:12px;color:var(--ink);word-break:break-word">${esc(rv.text)}</div>
-        </div>
-        <div class="acts">
-          <button class="ck${isDone?' on':''}" data-revck="${rv.id}" data-field="${field}">${isDone?'✓':''}</button>
-          <button class="dl" data-del="${rv.id}">×</button>
-        </div>
-      </div>`;
-    }).join('')}` : '';
-
-  const todayFmt = `${dkey(viewDate)===dkey(today())?' 🔴':''}`;
+  const revT=S.revs.filter(r=>r.studyDate===key||r.rev1Date===key||r.rev2Date===key);
+  const revHtml=revT.length?`<div class="sl" style="color:var(--red);margin-top:10px">🔁 Revisions due today</div>`+revT.map(r=>{
+    const d7=r.rev2Date===key,d4=r.rev1Date===key;
+    const type=d7?'d7':d4?'d4':'d1';
+    const field=d7?'d7done':d4?'d4done':'d1done';
+    const isDone=r[field];
+    const lbl=d7?'⚡ Day 7':d4?'🔁 Day 4':'📖 Day 1';
+    const sj=SUBJ[r.subject]||SUBJ.Other;
+    return `<div class="re"><div class="ri">
+      <div class="rt2"><span class="rsj" style="background:${sj.c}">${sj.e} ${r.subject}</span><span class="rty ${type}">${lbl}</span></div>
+      <div style="font-size:13px;color:var(--ink);word-break:break-word">${esc(r.text)}</div>
+    </div><div class="ra">
+      <button class="ck2${isDone?' on':''}" data-rck="${r.id}" data-f="${field}">${isDone?'✓':''}</button>
+      <button class="dl" data-del="${r.id}">×</button>
+    </div></div>`;
+  }).join(''):'';
 
   return `
   <div class="dnav">
-    <button id="prev-day" ${dn<=0?'disabled':''}>← Prev</button>
+    <button id="pd" ${dn<=0?'disabled':''}>← Prev</button>
     <div class="dnav-c">
-      <div class="dnav-l">${fmtDate(viewDate)}${todayFmt}</div>
+      <div class="dnav-l">${fmtD(VD)}${isT?' 🔴':''}</div>
       <div class="dnav-s">Day ${dn+1}/30 · ${pct}% done</div>
     </div>
-    <button id="next-day" ${dn>=29?'disabled':''}>Next →</button>
+    <button id="nd" ${dn>=29?'disabled':''}>Next →</button>
   </div>
 
   <div class="sc gr">
     <div class="sc-t">🌅 <span style="color:var(--green)">Morning Routine</span>
-      <div style="flex:1;height:4px;background:var(--bd);border-radius:2px;overflow:hidden">
-        <div style="height:100%;width:${mDone/5*100}%;background:var(--green);border-radius:2px"></div>
+      <div style="flex:1;height:4px;background:var(--bd);border-radius:2px;overflow:hidden;margin-left:4px">
+        <div style="height:100%;width:${mp/5*100}%;background:var(--green);border-radius:2px"></div>
       </div>
     </div>
     ${ci('water500','💧 500ml water on waking',10)}
     ${ci('yoga','🌊 Yoga 20 min (Adriene)',20)}
     ${ci('posture','🧘 Posture routine 8–10 min',10)}
-    ${wo?ci('workout','⚔️ Haki Training — 25 min workout',30):ci('','⚓ Rest day — no workout',0,true)}
+    ${wo?ci('workout','⚔️ Haki Training — 25 min',30):ci('','\u2693 Rest day — no workout',0,true)}
     ${ci('left-8am','🏃 Reached library by 8 AM',20)}
-    <textarea rows="2" placeholder="Morning notes…" data-field="mn" data-key="${key}">${esc(dd.mn||'')}</textarea>
+    <textarea class="ni" rows="2" placeholder="Morning notes…" data-f="mn" data-key="${key}">${esc(dd.mn||'')}</textarea>
   </div>
 
   <div class="sc op">
     <div class="sc-t">⚔️ <span style="color:var(--red)">Study Log — One Piece</span></div>
     ${ci('study-ontime','📖 Started studying by 8 AM',25)}
-    <div class="sr"><span>⏰ Study start time</span><input type="text" placeholder="7:58 AM" value="${esc(dd.ss||'')}" data-field="ss" data-key="${key}"></div>
-    <div class="sr"><span>📚 Hours studied</span><input type="text" placeholder="e.g. 8.5" value="${esc(dd.sh||'')}" data-field="sh" data-key="${key}"></div>
-    <div class="sr"><span>🗺️ Topics covered</span><input type="text" placeholder="Pharma Ch4…" value="${esc(dd.tp||'')}" data-field="tp" data-key="${key}" style="width:130px"></div>
+    <div class="sr"><span class="sr-l">⏰ Study start</span><input class="sr-i" type="text" placeholder="7:58 AM" value="${esc(dd.ss||'')}" data-f="ss" data-key="${key}"></div>
+    <div class="sr"><span class="sr-l">📚 Hours studied</span><input class="sr-i" type="text" placeholder="e.g. 8.5" value="${esc(dd.sh||'')}" data-f="sh" data-key="${key}"></div>
+    <div class="sr"><span class="sr-l">🗺️ Topics</span><input class="sr-i" type="text" placeholder="Pharma Ch4…" value="${esc(dd.tp||'')}" data-f="tp" data-key="${key}"></div>
     ${revHtml}
-    <textarea rows="3" placeholder="Battle notes…" data-field="sn" data-key="${key}">${esc(dd.sn||'')}</textarea>
+    <textarea class="ni" rows="3" placeholder="Battle notes…" data-f="sn" data-key="${key}">${esc(dd.sn||'')}</textarea>
   </div>
 
   <div class="sc hk">
     <div class="sc-t">🏐 <span style="color:var(--hk)">Health — Haikyuu</span></div>
-    ${ci('water3l','💧 Drank 3 litres of water',10)}
+    ${ci('water3l','💧 3 litres of water',10)}
     ${ci('nojunk','🥦 No junk food today',15)}
     ${ci('nosugar','🍬 No added sugar',15)}
     ${ci('protein','🥚 Protein at every meal',10)}
     ${ci('skincare','✨ Skincare (morning + night)',5)}
     ${ci('sunscreen','☀️ Sunscreen applied',5)}
     ${ci('sleep1130','🌙 In bed by 11:30 PM',15)}
-    <textarea rows="2" placeholder="Health notes…" data-field="hn" data-key="${key}">${esc(dd.hn||'')}</textarea>
+    <textarea class="ni" rows="2" placeholder="Health notes…" data-f="hn" data-key="${key}">${esc(dd.hn||'')}</textarea>
   </div>
 
   <div class="sc na">
     <div class="sc-t">🍃 <span style="color:var(--orange)">Chakra Check — Naruto</span></div>
     <div class="mr">
-      <span class="ml">😊 Mood</span>
-      <input type="range" min="1" max="10" value="${dd.mood||5}" data-field="mood" data-key="${key}" data-num="1" style="accent-color:var(--orange)">
-      <span class="mv" id="mood-val" style="color:var(--orange)">${dd.mood||5}/10</span>
+      <span class="mr-l">😊 Mood</span>
+      <input type="range" min="1" max="10" value="${dd.mood||5}" data-f="mood" data-key="${key}" data-num="1" style="accent-color:var(--orange)">
+      <span class="mr-v" id="mv" style="color:var(--orange)">${dd.mood||5}/10</span>
     </div>
     <div class="mr">
-      <span class="ml">⚡ Energy</span>
-      <input type="range" min="1" max="10" value="${dd.energy||5}" data-field="energy" data-key="${key}" data-num="1" style="accent-color:var(--blue)">
-      <span class="mv" id="energy-val" style="color:var(--blue)">${dd.energy||5}/10</span>
+      <span class="mr-l">⚡ Energy</span>
+      <input type="range" min="1" max="10" value="${dd.energy||5}" data-f="energy" data-key="${key}" data-num="1" style="accent-color:var(--blue)">
+      <span class="mr-v" id="ev" style="color:var(--blue)">${dd.energy||5}/10</span>
     </div>
     ${ci('journaled','📝 Journaled today',20)}
-    <textarea rows="4" placeholder="Journal — thoughts, feelings, wins, struggles…" data-field="jn" data-key="${key}">${esc(dd.jn||'')}</textarea>
+    <textarea class="ni" rows="4" placeholder="Journal — thoughts, wins, struggles…" data-f="jn" data-key="${key}">${esc(dd.jn||'')}</textarea>
   </div>
 
   <div class="sc dt">
     <div class="sc-t">📵 <span style="color:var(--purple)">Digital Detox</span></div>
-    ${ci('noscreen_am','📵 Zero screen first 2 hours after waking',20)}
+    ${ci('noscreen_am','📵 Zero screen first 2 hours',20)}
     ${ci('noscreen_pm','🌙 Zero screen 30 min before bed',15)}
-    <textarea rows="2" placeholder="Detox notes…" data-field="dn" data-key="${key}">${esc(dd.dn||'')}</textarea>
+    <textarea class="ni" rows="2" placeholder="Detox notes…" data-f="dn" data-key="${key}">${esc(dd.dn||'')}</textarea>
   </div>
 
   <div class="sb">
     <div style="font-size:11px;color:#94a3b8;margin-bottom:3px;letter-spacing:.1em;text-transform:uppercase">Today's Battle Score</div>
     <div class="sp">${pct}%</div>
-    <div class="ss">${done} of ${total} habits complete</div>
+    <div style="font-size:11px;color:#94a3b8">${done} of ${total} habits</div>
     <div class="sbar"><div class="sf" style="width:${pct}%"></div></div>
   </div>
-  <div style="height:16px"></div>`;
+  <div style="height:20px"></div>`;
 }
 
-// ── TRACKER PAGE ─────────────────────────────────
-function renderTracker() {
-  const TODAY=today();
-  const scores=Array.from({length:30},(_,i)=>getScore(S.days[dkey(addDays(START,i))]||{}));
-  const elapsed=Math.max(1,Array.from({length:30},(_,i)=>addDays(START,i)).filter(d=>d<=TODAY).length);
-  const avg=Math.round(scores.slice(0,elapsed).reduce((a,s)=>a+s.pct,0)/elapsed);
-  const perfect=scores.filter((s,i)=>addDays(START,i)<=TODAY&&s.pct===100).length;
-  let streak=0,sd=new Date(TODAY);
-  while(sd>=START){const{pct}=getScore(S.days[dkey(sd)]||{});if(pct===100){streak++;sd.setDate(sd.getDate()-1);}else break;}
+// ══════════════════════════════════════════════════
+// TRACKER PAGE
+// ══════════════════════════════════════════════════
+function buildTracker() {
+  const NOW=today();
+  const scores=Array.from({length:30},(_,i)=>getScore(S.days[dkey(addD(START,i))]||{}));
+  const el=Math.max(1,Array.from({length:30},(_,i)=>addD(START,i)).filter(d=>d<=NOW).length);
+  const avg=Math.round(scores.slice(0,el).reduce((a,s)=>a+s.pct,0)/el);
+  const perf=scores.filter((s,i)=>addD(START,i)<=NOW&&s.pct===100).length;
+  let str=0,sd=new Date(NOW);
+  while(sd>=START){const{pct}=getScore(S.days[dkey(sd)]||{});if(pct===100){str++;sd.setDate(sd.getDate()-1);}else break;}
 
-  const gridHTML = Array.from({length:30},(_,i)=>{
-    const date=addDays(START,i);
-    const isT=dkey(date)===dkey(TODAY),isF=date>TODAY;
+  const grid=Array.from({length:30},(_,i)=>{
+    const d=addD(START,i),isT=dkey(d)===dkey(NOW),isF=d>NOW;
     const{pct}=scores[i];
-    const cls=isT?'gt':isF?'gu':pct===100?'gf':pct>0?'gp':'gm';
-    return `<div class="gc ${cls}">${date.getDate()}${!isF&&!isT?`<span class="gcs">${pct}%</span>`:''}</div>`;
+    const cl=isT?'gt':isF?'gu':pct===100?'gf':pct>0?'gp':'gm';
+    return `<div class="gc ${cl}">${d.getDate()}${!isF&&!isT?`<span style="font-size:7px;display:block">${pct}%</span>`:''}</div>`;
   }).join('');
 
   const bars=[
@@ -527,426 +496,342 @@ function renderTracker() {
     ['💧 Water 3L','water3l','var(--hk)'],['🥦 No junk','nojunk','var(--hk)'],
     ['✨ Skincare','skincare','var(--hk)'],['🌙 Sleep 11:30','sleep1130','var(--blue)'],
     ['📵 No screen AM','noscreen_am','var(--purple)'],['📝 Journaled','journaled','var(--orange)'],
-  ].map(([lbl,id,col])=>{
-    const done=Array.from({length:30},(_,i)=>addDays(START,i)).filter(d=>d<=TODAY&&S.days[dkey(d)]?.checks?.[id]).length;
-    const pct=Math.round(done/elapsed*100);
-    return `<div class="hbr">
-      <div class="hbt"><span>${lbl}</span><span style="color:${col};font-weight:600">${done}/${elapsed}d</span></div>
-      <div class="hbk"><div class="hbf" style="width:${pct}%;background:${col}"></div></div>
-    </div>`;
+  ].map(([l,id,c])=>{
+    const d=Array.from({length:30},(_,i)=>addD(START,i)).filter(d=>d<=NOW&&S.days[dkey(d)]?.checks?.[id]).length;
+    return `<div class="hbr"><div class="hbt"><span>${l}</span><span style="color:${c};font-weight:600">${d}/${el}d</span></div>
+    <div class="hbk"><div class="hbf" style="width:${Math.round(d/el*100)}%;background:${c}"></div></div></div>`;
   }).join('');
 
   return `
   <div class="stats">
-    <div class="stc"><div class="stv">${streak}</div><div class="stl">🔥 Streak</div></div>
-    <div class="stc"><div class="stv">${avg}%</div><div class="stl">📊 Avg Score</div></div>
-    <div class="stc"><div class="stv">${perfect}</div><div class="stl">⭐ Perfect Days</div></div>
+    <div class="stc"><div class="stv">${str}</div><div class="stl">🔥 Streak</div></div>
+    <div class="stc"><div class="stv">${avg}%</div><div class="stl">📊 Avg</div></div>
+    <div class="stc"><div class="stv">${perf}</div><div class="stl">⭐ Perfect</div></div>
   </div>
-  <div class="sl" style="color:var(--red)">📊 30-Day Grand Line Map</div>
-  <div class="g30">${gridHTML}</div>
+  <div class="sl" style="color:var(--red)">30-Day Grand Line Map</div>
+  <div class="g30">${grid}</div>
   <div class="leg">
     <div class="li"><div class="ld" style="background:#22c55e"></div>100%</div>
     <div class="li"><div class="ld" style="background:#fef3c7;border:1px solid var(--gold)"></div>Partial</div>
     <div class="li"><div class="ld" style="background:#fef2f2;border:1px solid #fca5a5"></div>Missed</div>
     <div class="li"><div class="ld" style="background:#f5f5f0"></div>Upcoming</div>
   </div>
-  <div class="sl" style="color:var(--hk);margin-top:16px">🏐 Habit Consistency</div>
+  <div class="sl" style="color:var(--hk);margin-top:16px">Habit Consistency</div>
   ${bars}
-  <div style="height:16px"></div>`;
+  <div style="height:20px"></div>`;
 }
 
-// ── REVISION PAGE ────────────────────────────────
-function renderRevision() {
+// ══════════════════════════════════════════════════
+// REVISION PAGE
+// ══════════════════════════════════════════════════
+function buildRevision() {
   const tk=dkey(today());
-  const mastered=S.revs.filter(rv=>rv.d1done&&rv.d4done&&rv.d7done).length;
-
-  // Subject buttons
-  const subjBtns = Object.entries(SUBJECTS).map(([name,s])=>
-    `<button class="fb${revSubj===name?' on':''}" style="${revSubj===name?`background:${s.c};border-color:${s.c}`:''}" data-revsubj="${name}">${s.em} ${name}</button>`
-  ).join('');
-
-  // Filter buttons
-  const usedSubjs = [...new Set(S.revs.map(rv=>rv.subject))].filter(s=>SUBJECTS[s]);
-  const filterBtns = ['Today','All',...usedSubjs].map(f=>{
-    const S2=SUBJECTS[f];
-    return `<button class="fb${revFilter===f?' on':''}" style="${revFilter===f?`background:${S2?.c||'var(--red)'};border-color:${S2?.c||'var(--red)'}`:''}" data-revfilter="${f}">${f}</button>`;
-  }).join('');
-
-  // Items
-  let items=[];
-  if(revFilter==='Today') {
-    S.revs.forEach(rv=>{
-      if(rv.studyDate===tk) items.push({rv,type:'d1',field:'d1done',isDone:rv.d1done,label:'📖 Day 1'});
-      if(rv.rev1Date===tk)  items.push({rv,type:'d4',field:'d4done',isDone:rv.d4done,label:'🔁 Day 4'});
-      if(rv.rev2Date===tk)  items.push({rv,type:'d7',field:'d7done',isDone:rv.d7done,label:'⚡ Day 7'});
-    });
-  } else if(revFilter==='All') {
-    S.revs.forEach(rv=>{
-      items.push({rv,type:'d1',field:'d1done',isDone:rv.d1done,label:'📖 D1'});
-      items.push({rv,type:'d4',field:'d4done',isDone:rv.d4done,label:'🔁 D4'});
-      items.push({rv,type:'d7',field:'d7done',isDone:rv.d7done,label:'⚡ D7'});
-    });
-  } else {
-    S.revs.filter(rv=>rv.subject===revFilter).forEach(rv=>{
-      items.push({rv,type:'d1',field:'d1done',isDone:rv.d1done,label:'📖 D1'});
-      items.push({rv,type:'d4',field:'d4done',isDone:rv.d4done,label:'🔁 D4'});
-      items.push({rv,type:'d7',field:'d7done',isDone:rv.d7done,label:'⚡ D7'});
-    });
-  }
-
-  const itemsHTML = items.length===0
-    ? `<div class="em2">${revFilter==='Today'?'No revisions due today. Add above ↑':'No topics yet.'}</div>`
-    : items.map(({rv,type,field,isDone,label})=>{
-        const S2=SUBJECTS[rv.subject]||SUBJECTS['Other'];
-        const xpVal=type==='d7'?50:type==='d4'?30:20;
-        return `<div class="re">
-          <div class="info">
-            <div class="top">
-              <span class="rsj" style="background:${S2.c}">${S2.em} ${rv.subject}</span>
-              <span class="rty ${type}">${label}</span>
-            </div>
-            <div style="font-size:12px;color:var(--ink);margin-bottom:2px;word-break:break-word">${esc(rv.text)}</div>
-            ${type!=='d1'?`<div style="font-size:10px;color:var(--mt)">Studied: ${fmtShort(fromKey(rv.studyDate))}</div>`:''}
-            <div style="font-size:9px;color:#ffd700;font-weight:700">+${xpVal} Berries</div>
-          </div>
-          <div class="acts">
-            <button class="ck${isDone?' on':''}" data-revck="${rv.id}" data-field="${field}">${isDone?'✓':''}</button>
-            <button class="dl" data-del="${rv.id}">×</button>
-          </div>
-        </div>`;
-      }).join('');
-
-  // Default date
+  const mastered=S.revs.filter(r=>r.d1done&&r.d4done&&r.d7done).length;
   const td=today();
   const defDate=`${td.getFullYear()}-${String(td.getMonth()+1).padStart(2,'0')}-${String(td.getDate()).padStart(2,'0')}`;
 
-  return `
-  <div class="th op">
-    <div style="font-family:'Pirata One',Georgia,serif;font-size:18px;line-height:1;margin-bottom:3px">🍎 Devil Fruit Mastery</div>
-    <div style="font-size:10px;opacity:.85">1·4·7 · ${S.revs.length} topics · ${mastered} mastered</div>
-  </div>
-  <div class="rf">
-    <div class="rt">+ Awaken New Ability</div>
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-      <span style="font-size:12px;color:var(--mt);white-space:nowrap">Study date:</span>
-      <input type="date" id="rev-date" value="${defDate}" style="flex:1;padding:7px 9px;border-radius:5px">
-    </div>
-    <div class="fg">${subjBtns}</div>
-    <input type="text" id="rev-text" placeholder="e.g. Beta blockers — mechanism, uses, side effects" style="width:100%;padding:9px 12px;border-radius:6px;font-size:13px;margin-bottom:8px">
-    <button id="add-rev" style="width:100%;padding:11px;border:none;border-radius:6px;background:var(--red);color:white;font-family:'Pirata One',Georgia,serif;font-size:15px;cursor:pointer">ADD — AUTO-SCHEDULES DAY 1 · 4 · 7</button>
-  </div>
-  <div class="fg">${filterBtns}</div>
-  ${itemsHTML}
-  <div style="height:16px"></div>`;
-}
-
-// ── REVIEW PAGE ──────────────────────────────────
-function renderReview() {
-  const TODAY=today();
-  const tk=dkey(TODAY);
-  const dd=S.days[tk]||{};
-  const elapsed=Math.max(1,Array.from({length:30},(_,i)=>addDays(START,i)).filter(d=>d<=TODAY).length);
-  const scores=Array.from({length:30},(_,i)=>getScore(S.days[dkey(addDays(START,i))]||{}));
-  const avg=Math.round(scores.slice(0,elapsed).reduce((a,s)=>a+s.pct,0)/elapsed);
-  const mastered=S.revs.filter(rv=>rv.d1done&&rv.d4done&&rv.d7done).length;
-
-  const typeBtns=['daily','weekly','15-day','30-day'].map(t=>
-    `<button class="fb${reviewType===t?' on':''}" style="${reviewType===t?'background:var(--teal);border-color:var(--teal)':''}" data-revtype="${t}">${t.charAt(0).toUpperCase()+t.slice(1)}</button>`
+  const subjBtns=Object.entries(SUBJ).map(([n,s])=>
+    `<button class="fb${RSUBJ===n?' on':''}" style="${RSUBJ===n?`background:${s.c};border-color:${s.c}`:''}" data-rs="${n}">${s.e} ${n}</button>`
   ).join('');
 
-  const ta=(rkey,qkey,label)=>`<div><div class="rq">${label}</div><textarea rows="3" placeholder="Write here…" data-rvkey="${rkey}" data-rvq="${qkey}" style="width:100%;padding:8px 10px;border-radius:5px;font-size:12px;min-height:55px;resize:none;outline:none;background:var(--c2);border:1.5px solid var(--bd);font-family:inherit">${esc(S.rvws[rkey]?.[qkey]||'')}</textarea></div>`;
-  const rs=(l,v)=>`<div class="rstat"><span style="font-size:12px;color:var(--mt)">${l}</span><span style="font-family:'Pirata One',Georgia,serif;font-size:16px;color:var(--red)">${v}</span></div>`;
+  const usedSubjs=[...new Set(S.revs.map(r=>r.subject))].filter(s=>SUBJ[s]);
+  const filtBtns=['Today','All',...usedSubjs].map(f=>{
+    const s=SUBJ[f];
+    return `<button class="fb${RFILT===f?' on':''}" style="${RFILT===f?`background:${s?.c||'var(--red)'};border-color:${s?.c||'var(--red)'}`:''}" data-rf="${f}">${f}</button>`;
+  }).join('');
 
-  let content='';
-  if(reviewType==='daily') {
-    content=`<div class="rv">
-      <div style="font-family:'Pirata One',Georgia,serif;font-size:16px;color:var(--red);margin-bottom:10px">⚔️ ${fmtDate(TODAY)}</div>
+  let items=[];
+  if(RFILT==='Today') {
+    S.revs.forEach(r=>{
+      if(r.studyDate===tk) items.push({r,t:'d1',f:'d1done',d:r.d1done,l:'📖 Day 1'});
+      if(r.rev1Date===tk)  items.push({r,t:'d4',f:'d4done',d:r.d4done,l:'🔁 Day 4'});
+      if(r.rev2Date===tk)  items.push({r,t:'d7',f:'d7done',d:r.d7done,l:'⚡ Day 7'});
+    });
+  } else if(RFILT==='All') {
+    S.revs.forEach(r=>{
+      items.push({r,t:'d1',f:'d1done',d:r.d1done,l:'📖 D1'});
+      items.push({r,t:'d4',f:'d4done',d:r.d4done,l:'🔁 D4'});
+      items.push({r,t:'d7',f:'d7done',d:r.d7done,l:'⚡ D7'});
+    });
+  } else {
+    S.revs.filter(r=>r.subject===RFILT).forEach(r=>{
+      items.push({r,t:'d1',f:'d1done',d:r.d1done,l:'📖 D1'});
+      items.push({r,t:'d4',f:'d4done',d:r.d4done,l:'🔁 D4'});
+      items.push({r,t:'d7',f:'d7done',d:r.d7done,l:'⚡ D7'});
+    });
+  }
+
+  const itemsHtml=items.length===0
+    ?`<div class="em2">${RFILT==='Today'?'No revisions due today. Add above.':'No topics yet.'}</div>`
+    :items.map(({r,t,f,d,l})=>{
+      const sj=SUBJ[r.subject]||SUBJ.Other, xv=t==='d7'?50:t==='d4'?30:20;
+      return `<div class="re"><div class="ri">
+        <div class="rt2"><span class="rsj" style="background:${sj.c}">${sj.e} ${r.subject}</span><span class="rty ${t}">${l}</span></div>
+        <div style="font-size:13px;color:var(--ink);margin-bottom:3px;word-break:break-word">${esc(r.text)}</div>
+        ${t!=='d1'?`<div style="font-size:10px;color:var(--mt)">Studied: ${fmtS(fromK(r.studyDate))}</div>`:''}
+        <div style="font-size:10px;color:#d97706;font-weight:700">+${xv} Berries</div>
+      </div><div class="ra">
+        <button class="ck2${d?' on':''}" data-rck="${r.id}" data-f="${f}">${d?'✓':''}</button>
+        <button class="dl" data-del="${r.id}">×</button>
+      </div></div>`;
+    }).join('');
+
+  return `
+  <div class="th-op">
+    <div style="font-size:18px;font-weight:800;margin-bottom:3px">🍎 Devil Fruit Mastery</div>
+    <div style="font-size:11px;opacity:.8">1·4·7 Spaced Repetition · ${S.revs.length} topics · ${mastered} mastered</div>
+  </div>
+  <div class="rf">
+    <div style="font-size:16px;font-weight:800;color:var(--red);margin-bottom:10px">+ Awaken New Ability</div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
+      <span style="font-size:12px;color:var(--mt);white-space:nowrap">Study date:</span>
+      <input type="date" id="rd" value="${defDate}" style="flex:1;padding:8px 10px;border-radius:6px;border:1.5px solid var(--bd);background:var(--c2);color:var(--ink);font-family:inherit;font-size:13px;outline:none">
+    </div>
+    <div class="fg">${subjBtns}</div>
+    <input type="text" id="rt" placeholder="e.g. Beta blockers — mechanism, uses, side effects"
+      style="width:100%;padding:10px 12px;border-radius:7px;border:1.5px solid var(--bd);background:var(--c2);color:var(--ink);font-size:13px;outline:none;margin-bottom:9px;font-family:inherit">
+    <button id="addrv" style="width:100%;padding:12px;border:none;border-radius:7px;background:var(--red);color:white;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;touch-action:manipulation">ADD — AUTO-SCHEDULES DAY 1 · 4 · 7</button>
+  </div>
+  <div class="fg">${filtBtns}</div>
+  ${itemsHtml}
+  <div style="height:20px"></div>`;
+}
+
+// ══════════════════════════════════════════════════
+// REVIEW PAGE
+// ══════════════════════════════════════════════════
+function buildReview() {
+  const NOW=today(), tk=dkey(NOW), dd=S.days[tk]||{};
+  const el=Math.max(1,Array.from({length:30},(_,i)=>addD(START,i)).filter(d=>d<=NOW).length);
+  const scores=Array.from({length:30},(_,i)=>getScore(S.days[dkey(addD(START,i))]||{}));
+  const avg=Math.round(scores.slice(0,el).reduce((a,s)=>a+s.pct,0)/el);
+  const mastered=S.revs.filter(r=>r.d1done&&r.d4done&&r.d7done).length;
+
+  const typeBtns=['daily','weekly','15-day','30-day'].map(t=>
+    `<button class="fb${RVTYPE===t?' on':''}" style="${RVTYPE===t?'background:var(--teal);border-color:var(--teal)':''}" data-rvt="${t}">${t.charAt(0).toUpperCase()+t.slice(1)}</button>`
+  ).join('');
+
+  const ta=(rk,qk,lbl)=>`<div><div class="rq">${lbl}</div>
+    <textarea class="ni" rows="3" data-rvk="${rk}" data-rvq="${qk}">${esc(S.rvws[rk]?.[qk]||'')}</textarea></div>`;
+  const rs=(l,v)=>`<div class="rstat"><span style="font-size:12px;color:var(--mt)">${l}</span><span style="font-size:16px;font-weight:800;color:var(--red)">${v}</span></div>`;
+
+  let body='';
+  if(RVTYPE==='daily') {
+    body=`<div class="rv">
+      <div style="font-size:16px;font-weight:700;color:var(--red);margin-bottom:10px">⚔️ ${fmtD(NOW)}</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:10px">
         ${rs('📊 Score',getScore(dd).pct+'%')}${rs('⏰ Start',dd.ss||'—')}${rs('📚 Hours',dd.sh||'—')}${rs('😊 Mood',(dd.mood||5)+'/10')}
       </div>
-      ${ta(`d-${tk}`,'win','⚔️ What did I conquer today?')}
-      ${ta(`d-${tk}`,'hard','🌊 What was hard?')}
-      ${ta(`d-${tk}`,'grateful','🍃 Grateful for:')}
-      ${ta(`d-${tk}`,'tomorrow','🎯 Tomorrow I will…')}
+      ${ta('d-'+tk,'win','⚔️ What did I conquer?')}
+      ${ta('d-'+tk,'hard','🌊 What was hard?')}
+      ${ta('d-'+tk,'grateful','🍃 Grateful for:')}
+      ${ta('d-'+tk,'tmr','🎯 Tomorrow I will…')}
     </div>`;
-  } else if(reviewType==='weekly') {
-    content=[1,2,3,4].map(w=>{
-      const wd=Array.from({length:7},(_,i)=>addDays(START,(w-1)*7+i));
+  } else if(RVTYPE==='weekly') {
+    body=[1,2,3,4].map(w=>{
+      const wd=Array.from({length:7},(_,i)=>addD(START,(w-1)*7+i));
       const wa=Math.round(wd.reduce((a,d)=>a+getScore(S.days[dkey(d)]||{}).pct,0)/7);
       const wt=wd.filter(d=>S.days[dkey(d)]?.checks?.['study-ontime']).length;
       const ww=wd.filter(d=>S.days[dkey(d)]?.checks?.['workout']).length;
       return `<div class="rv">
-        <div style="font-family:'Pirata One',Georgia,serif;font-size:15px;color:var(--teal);margin-bottom:10px">📆 Week ${w}</div>
+        <div style="font-size:15px;font-weight:700;color:var(--teal);margin-bottom:10px">📆 Week ${w}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:10px">
           ${rs('📊 Avg',wa+'%')}${rs('⏰ On-time',wt+'/7')}${rs('⚔️ Workouts',ww+'/3')}${rs('🍎 Topics',S.revs.length)}
         </div>
-        ${ta(`w-${w}`,'best','What went best?')}
-        ${ta(`w-${w}`,'change','What needs to change?')}
-        ${ta(`w-${w}`,'goal',"Next week's goal:")}
+        ${ta('w'+w,'best','What went best?')}${ta('w'+w,'change','What to change?')}${ta('w'+w,'goal','Next week goal:')}
       </div>`;
     }).join('');
-  } else if(reviewType==='15-day') {
-    const ot=Array.from({length:15},(_,i)=>addDays(START,i)).filter(d=>S.days[dkey(d)]?.checks?.['study-ontime']).length;
-    const wk=Array.from({length:15},(_,i)=>addDays(START,i)).filter(d=>S.days[dkey(d)]?.checks?.['workout']).length;
-    content=`<div class="rv">
-      <div style="font-family:'Pirata One',Georgia,serif;font-size:15px;color:var(--purple);margin-bottom:10px">🌗 15-Day Review</div>
+  } else if(RVTYPE==='15-day') {
+    const ot=Array.from({length:15},(_,i)=>addD(START,i)).filter(d=>S.days[dkey(d)]?.checks?.['study-ontime']).length;
+    const wk=Array.from({length:15},(_,i)=>addD(START,i)).filter(d=>S.days[dkey(d)]?.checks?.['workout']).length;
+    body=`<div class="rv">
+      <div style="font-size:15px;font-weight:700;color:var(--purple);margin-bottom:10px">🌗 15-Day Review</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:10px">
-        ${rs('📊 Avg',avg+'%')}${rs('⏰ On-time',ot+'/15')}${rs('⚔️ Workouts',wk+'')}${rs('🍎 Topics',S.revs.length)}
+        ${rs('📊 Avg',avg+'%')}${rs('⏰ On-time',ot+'/15')}${rs('⚔️ Workouts',''+wk)}${rs('🍎 Topics',S.revs.length)}
       </div>
-      ${ta('r15','sticking','Best sticking habit?')}
-      ${ta('r15','broken','Habit falling apart?')}
-      ${ta('r15','change','Changes for 2nd half?')}
+      ${ta('r15','best','Best habit sticking?')}${ta('r15','broken','Habit falling apart?')}${ta('r15','change','Changes for 2nd half?')}
     </div>`;
   } else {
-    content=`<div class="rv">
-      <div style="font-family:'Pirata One',Georgia,serif;font-size:17px;color:var(--red);margin-bottom:10px">🏴‍☠️ Month-End Reckoning</div>
+    body=`<div class="rv">
+      <div style="font-size:17px;font-weight:700;color:var(--red);margin-bottom:10px">🏴 Month-End Reckoning</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:10px">
-        ${rs('📊 Avg',avg+'%')}${rs('⭐ Perfect',scores.filter((s,i)=>addDays(START,i)<=TODAY&&s.pct===100).length+'d')}
+        ${rs('📊 Avg',avg+'%')}${rs('⭐ Perfect',scores.filter((s,i)=>addD(START,i)<=NOW&&s.pct===100).length+'d')}
         ${rs('🍎 Topics',S.revs.length)}${rs('⚡ Mastered',mastered)}
       </div>
-      ${ta('r30','proud','⚔️ Most proud of?')}
-      ${ta('r30','neet','📚 NEET prep?')}
-      ${ta('r30','body','💪 Physical changes?')}
-      ${ta('r30','island','🗺️ What island did you conquer?')}
-      ${ta('r30','may','🎯 Changes for May?')}
+      ${ta('r30','proud','Most proud of?')}${ta('r30','neet','NEET prep this month?')}
+      ${ta('r30','body','Physical changes?')}${ta('r30','island','What island did you conquer?')}${ta('r30','may','Changes for May?')}
     </div>`;
   }
 
-  return `<div class="fg" style="margin-bottom:12px">${typeBtns}</div>${content}<div style="height:16px"></div>`;
+  return `<div class="fg" style="margin-bottom:12px">${typeBtns}</div>${body}<div style="height:20px"></div>`;
 }
 
-// ── LOG PAGE ─────────────────────────────────────
-function renderLog() {
-  const xp=calcXP();
-  const rank=getRank(xp);
-  const next=getNext(xp);
+// ══════════════════════════════════════════════════
+// LOG PAGE
+// ══════════════════════════════════════════════════
+function buildLog() {
+  const xp=calcXP(), rank=getRank(xp), next=getNext(xp);
   const pct=next?(xp-rank.min)/(next.min-rank.min)*100:100;
-  let streak=0,sd=new Date(today());
-  while(sd>=START){const{pct:p}=getScore(S.days[dkey(sd)]||{});if(p===100){streak++;sd.setDate(sd.getDate()-1);}else break;}
+  let str=0, sd=new Date(today());
+  while(sd>=START){const{pct:p}=getScore(S.days[dkey(sd)]||{});if(p===100){str++;sd.setDate(sd.getDate()-1);}else break;}
 
-  const crewHTML=CREW.map(c=>`
-    <div class="cc${xp>=c.xp?'':' lk'}" style="${xp>=c.xp?`border-color:${c.color}`:''}">
-      <div style="font-size:24px;line-height:1;margin-bottom:4px">${c.emoji}</div>
-      <div style="font-family:'Pirata One',Georgia,serif;font-size:14px;margin-bottom:1px;color:${xp>=c.xp?c.color:''}">${c.name}</div>
-      <div style="font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--mt)">${xp>=c.xp?c.role:`${c.xp} XP`}</div>
-    </div>`).join('');
+  const crew=CREW.map(c=>`<div class="cc${xp>=c.xp?'':' lk'}" style="${xp>=c.xp?`border-color:${c.color}`:''}">
+    <div style="font-size:26px;margin-bottom:4px">${c.emoji}</div>
+    <div style="font-weight:700;font-size:14px;margin-bottom:2px;color:${xp>=c.xp?c.color:''}">${c.name}</div>
+    <div style="font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--mt)">${xp>=c.xp?c.role:`${c.xp} XP`}</div>
+  </div>`).join('');
 
-  const codeHTML=[
+  const code=[
     ['⚓','500ml water on waking','Before phone. Before anything.'],
-    ['🥩','Protein at every meal','Eggs, dal, sprouts.'],
-    ['🏝️','Post-lunch walk 10–15 min','Kills brain fog.'],
+    ['🥩','Protein at every meal','Eggs, dal, sprouts — every meal.'],
+    ['🏝️','Post-lunch walk 10–15 min','Kills afternoon brain fog.'],
     ['🧘','Never skip yoga + posture','10 min even on worst days.'],
     ['🌙','Sleep by 11:30 PM','Fat loss + NEET memory.'],
     ['📵','No screen first 2 hours','BDNF peaks — protect this.'],
-  ].map(([em,t,b])=>`<div class="cc2"><span style="font-size:18px;flex-shrink:0">${em}</span><div><div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:1px">${t}</div><div style="font-size:11px;color:var(--mt)">${b}</div></div></div>`).join('');
+  ].map(([e,t,b])=>`<div class="cc2"><span style="font-size:20px">${e}</span><div>
+    <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:2px">${t}</div>
+    <div style="font-size:11px;color:var(--mt)">${b}</div>
+  </div></div>`).join('');
 
   return `
   <div class="wanted">
-    <div class="wt">— WANTED —</div>
-    <div style="font-size:50px;margin:6px 0;line-height:1">🏴‍☠️</div>
-    <div class="wt">MONKEY D. LUFFY</div>
-    <div class="wr">${rank.name}</div>
-    <div class="wb">${rank.bounty}</div>
-    <div class="wby">BERRIES</div>
-    <div>
-      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--mt);margin-bottom:4px">
-        <span>${xp} XP</span><span>${next?`${next.min-xp} XP to "${next.name}"`:'MAX RANK 🏆'}</span>
-      </div>
-      <div class="xbar"><div class="xf" style="width:${Math.min(100,pct)}%"></div></div>
+    <div style="font-size:10px;letter-spacing:.3em;color:var(--mt);font-weight:600">— WANTED —</div>
+    <div style="font-size:54px;margin:8px 0;line-height:1">🏴</div>
+    <div style="font-size:10px;letter-spacing:.3em;color:var(--mt);font-weight:600;margin-bottom:4px">MONKEY D. LUFFY</div>
+    <div style="font-size:19px;font-weight:800;color:var(--red);margin-bottom:2px">${rank.name}</div>
+    <div style="font-size:32px;font-weight:900;color:var(--navy);line-height:1">${rank.bounty}</div>
+    <div style="font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--mt);margin-bottom:10px">BERRIES</div>
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--mt);margin-bottom:4px">
+      <span>${xp} XP</span><span>${next?`${next.min-xp} XP to "${next.name}"`:'MAX RANK!'}</span>
+    </div>
+    <div style="height:8px;background:#f0d9a0;border-radius:4px;overflow:hidden;border:1px solid var(--gold)">
+      <div style="height:100%;width:${Math.min(100,pct)}%;background:linear-gradient(90deg,var(--red),#ffd700);border-radius:4px"></div>
     </div>
   </div>
   <div class="stats">
-    <div class="stc"><div class="stv">${streak}</div><div class="stl">🔥 Streak</div></div>
+    <div class="stc"><div class="stv">${str}</div><div class="stl">🔥 Streak</div></div>
     <div class="stc"><div class="stv">${xp}</div><div class="stl">⚡ XP</div></div>
-    <div class="stc"><div class="stv">${Math.max(0,dayNum(today())+1)}/30</div><div class="stl">⚓ Day</div></div>
+    <div class="stc"><div class="stv">${Math.max(0,dayN(today())+1)}/30</div><div class="stl">⚓ Day</div></div>
   </div>
   <div class="sl" style="color:var(--red)">Your Crew</div>
-  <div class="cg">${crewHTML}</div>
+  <div class="cg">${crew}</div>
   <div class="sl" style="color:var(--red)">⚓ Pirate Code</div>
-  ${codeHTML}
-  <div style="height:16px"></div>`;
+  ${code}
+  <div style="height:20px"></div>`;
 }
 
+// ══════════════════════════════════════════════════
+// EVENT HANDLING — single delegation
+// ══════════════════════════════════════════════════
+document.addEventListener('click', function(e) {
+  // Tab click
+  const tab=e.target.closest('[data-t]');
+  if(tab){ goTab(+tab.dataset.t); return; }
 
-// ── Fast tab switch — CSS only, no re-render ─────
-function switchTab(i) {
-  // Update current tab
-  currentTab = i;
-  
-  // Switch page visibility instantly
-  document.querySelectorAll('.page').forEach((p,idx)=>{
-    p.style.display = idx===i ? 'block' : 'none';
-  });
-  
-  // Update tab bar active state
-  document.querySelectorAll('.tab').forEach((t,idx)=>{
-    t.classList.toggle('on', idx===i);
-  });
-  
-  // Update dots
-  document.querySelectorAll('.dot').forEach((d,idx)=>{
-    d.classList.toggle('on', idx===i);
-  });
-  
-  // Update header
-  renderHeader();
-  
-  // Scroll active page to top when switching
-  const activePage = document.getElementById('page-'+i);
-  if(activePage) activePage.scrollTop = 0;
-  
-  // Scroll tab into view
-  const tabEl = document.querySelectorAll('.tab')[i];
-  if(tabEl) tabEl.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
-}
-
-// ── Event Handlers ────────────────────────────────
-function attachHandlers() {
-  // Tab switching
-  document.getElementById('tabs').addEventListener('click', e=>{
-    const tab = e.target.closest('[data-tab]');
-    if(tab){ switchTab(+tab.dataset.tab); }
-  });
-  document.getElementById('dots').addEventListener('click', e=>{
-    const dot = e.target.closest('[data-tab]');
-    if(dot){ switchTab(+dot.dataset.tab); }
-  });
-
-  // Date navigation
-  const prev=document.getElementById('prev-day');
-  const next=document.getElementById('next-day');
-  if(prev) prev.addEventListener('click',()=>{ viewDate=addDays(viewDate,-1); rerenderPage(0); });
-  if(next) next.addEventListener('click',()=>{ viewDate=addDays(viewDate,1); rerenderPage(0); });
-
-  // Checkboxes — use touchend for instant mobile response
-  function handleCheckbox(e) {
-    const ci = e.target.closest('[data-chk]');
-    if(ci){
-      e.preventDefault();
-      e.stopPropagation();
-      const key=ci.dataset.key, id=ci.dataset.chk;
-      if(!S.days[key]) S.days[key]={};
-      if(!S.days[key].checks) S.days[key].checks={};
-      S.days[key].checks[id] = !S.days[key].checks[id];
-      save(); checkRankUp(); rerenderPage(currentTab);
-    }
+  // Habit checkbox
+  const ci=e.target.closest('[data-chk]');
+  if(ci){
+    const key=ci.dataset.key, id=ci.dataset.chk;
+    if(!S.days[key]) S.days[key]={};
+    if(!S.days[key].checks) S.days[key].checks={};
+    S.days[key].checks[id]=!S.days[key].checks[id];
+    save(); checkRank(); rr(0); return;
   }
-  document.addEventListener('touchend', handleCheckbox, {passive:false});
-  document.addEventListener('click', handleCheckbox);
 
-  // Revision checkboxes + delete
-  function handleRevActions(e) {
-    const ck = e.target.closest('[data-revck]');
-    if(ck){
-      e.preventDefault();
-      const id=+ck.dataset.revck, field=ck.dataset.field;
-      const rv=S.revs.find(r=>r.id===id);
-      if(rv){ rv[field]=!rv[field]; save(); checkRankUp(); rerenderPage(currentTab); }
-      return;
-    }
-    const dl = e.target.closest('[data-del]');
-    if(dl){
-      e.preventDefault();
-      const id=+dl.dataset.del;
-      const m=showModal(`<h2>Abandon Ability?</h2><p>Removes topic and all 3 revisions.</p><div class="mbr"><button class="s" onclick="this.closest('.mov').remove()">Cancel</button><button class="p" id="confirm-del">Delete</button></div>`);
-      m.querySelector('#confirm-del').addEventListener('click',()=>{ S.revs=S.revs.filter(r=>r.id!==id); save(); m.remove(); rerenderPage(currentTab); });
-    }
+  // Revision checkbox
+  const rck=e.target.closest('[data-rck]');
+  if(rck){
+    const id=+rck.dataset.rck, f=rck.dataset.f;
+    const rv=S.revs.find(r=>r.id===id);
+    if(rv){ rv[f]=!rv[f]; save(); checkRank(); rr(TAB); } return;
   }
-  document.addEventListener('touchend', handleRevActions, {passive:false});
-  document.addEventListener('click', handleRevActions);
 
-  // Subject filter buttons (revision)
-  document.addEventListener('click', e=>{
-    const rsb=e.target.closest('[data-revsubj]');
-    if(rsb){ revSubj=rsb.dataset.revsubj; rerenderPage(2); }
-    const rfb=e.target.closest('[data-revfilter]');
-    if(rfb){ revFilter=rfb.dataset.revfilter; rerenderPage(2); }
-    const rtb=e.target.closest('[data-revtype]');
-    if(rtb){ reviewType=rtb.dataset.revtype; rerenderPage(3); }
-  });
+  // Delete revision
+  const dl=e.target.closest('[data-del]');
+  if(dl){
+    const id=+dl.dataset.del;
+    const m=modal(`<h2>Abandon?</h2><p>Removes topic + all 3 revisions.</p>
+      <div class="mbr">
+        <button class="btn-s" onclick="this.closest('.mov').remove()">Cancel</button>
+        <button class="btn-p" id="cdel">Delete</button>
+      </div>`);
+    m.querySelector('#cdel').addEventListener('click',()=>{ S.revs=S.revs.filter(r=>r.id!==id); save(); m.remove(); rr(TAB); });
+    return;
+  }
 
   // Add revision
-  const addRevBtn=document.getElementById('add-rev');
-  if(addRevBtn) addRevBtn.addEventListener('click',()=>{
-    const text=(document.getElementById('rev-text')?.value||'').trim();
-    const dateStr=document.getElementById('rev-date')?.value||'';
-    if(!text) return;
-    const [y,m,d]=dateStr.split('-').map(Number);
+  if(e.target.id==='addrv'){
+    const txt=(document.getElementById('rt')?.value||'').trim();
+    const ds=document.getElementById('rd')?.value||'';
+    if(!txt) return;
+    const [y,m,d]=ds.split('-').map(Number);
     const sd=new Date(y,m-1,d); sd.setHours(0,0,0,0);
-    S.revs.push({id:S.nid++,text,subject:revSubj,
-      studyDate:dkey(sd),rev1Date:dkey(addDays(sd,3)),rev2Date:dkey(addDays(sd,6)),
-      d1done:false,d4done:false,d7done:false,addedAt:Date.now()});
-    save(); checkRankUp(); showToast('🍎 Devil Fruit awakened! +20 XP'); rerenderPage(2);
-  });
+    S.revs.push({id:S.nid++,text:txt,subject:RSUBJ,
+      studyDate:dkey(sd),rev1Date:dkey(addD(sd,3)),rev2Date:dkey(addD(sd,6)),
+      d1done:false,d4done:false,d7done:false});
+    save(); checkRank(); rr(2); return;
+  }
 
-  // Textarea & input change (debounced save)
-  document.addEventListener('input', e=>{
-    const ta=e.target.closest('textarea[data-field]');
-    if(ta){
-      const key=ta.dataset.key, f=ta.dataset.field;
-      if(!S.days[key]) S.days[key]={};
-      S.days[key][f]=ta.value; save();
-    }
-    const inp=e.target.closest('input[data-field]');
-    if(inp){
-      const key=inp.dataset.key, f=inp.dataset.field;
-      if(!S.days[key]) S.days[key]={};
-      S.days[key][f]=inp.dataset.num?Number(inp.value):inp.value;
-      // Update live display for sliders
-      if(f==='mood'){ const el=document.getElementById('mood-val'); if(el)el.textContent=inp.value+'/10'; }
-      if(f==='energy'){ const el=document.getElementById('energy-val'); if(el)el.textContent=inp.value+'/10'; }
-      save();
-    }
-    // Review textarea
-    const rta=e.target.closest('textarea[data-rvkey]');
-    if(rta){
-      const rk=rta.dataset.rvkey, qk=rta.dataset.rvq;
-      if(!S.rvws[rk]) S.rvws[rk]={};
-      S.rvws[rk][qk]=rta.value; save();
-    }
-  });
+  // Revision subject buttons
+  const rs=e.target.closest('[data-rs]');
+  if(rs){ RSUBJ=rs.dataset.rs; rr(2); return; }
 
-  // Swipe
-  attachSwipe();
-}
+  // Revision filter
+  const rf=e.target.closest('[data-rf]');
+  if(rf){ RFILT=rf.dataset.rf; rr(2); return; }
 
-function rerenderPage(i) {
-  const el=document.getElementById('page-'+i);
-  if(!el) return;
-  const scrollTop = el.scrollTop;
-  el.innerHTML = renderPage(i);
-  el.scrollTop = scrollTop;
-  attachHandlers();
-  renderTabs();
-  renderDots();
-  renderHeader();
-}
+  // Review type
+  const rvt=e.target.closest('[data-rvt]');
+  if(rvt){ RVTYPE=rvt.dataset.rvt; rr(3); return; }
 
-// ── Swipe navigation ──────────────────────────────
-function attachSwipe() {
+  // Date nav
+  if(e.target.id==='pd'){ VD=addD(VD,-1); rr(0); return; }
+  if(e.target.id==='nd'){ VD=addD(VD,1);  rr(0); return; }
+});
+
+// Input changes (text fields + sliders + textareas)
+document.addEventListener('input', function(e) {
+  // Day fields
+  const el=e.target;
+  if(el.dataset.key && el.dataset.f) {
+    const key=el.dataset.key, f=el.dataset.f;
+    if(!S.days[key]) S.days[key]={};
+    S.days[key][f] = el.dataset.num ? Number(el.value) : el.value;
+    // Live update slider display
+    if(f==='mood'){ const mv=document.getElementById('mv'); if(mv) mv.textContent=el.value+'/10'; }
+    if(f==='energy'){ const ev=document.getElementById('ev'); if(ev) ev.textContent=el.value+'/10'; }
+    save(); return;
+  }
+  // Review fields
+  if(el.dataset.rvk && el.dataset.rvq) {
+    const rk=el.dataset.rvk, qk=el.dataset.rvq;
+    if(!S.rvws[rk]) S.rvws[rk]={};
+    S.rvws[rk][qk]=el.value;
+    save(); return;
+  }
+});
+
+// ── Swipe ─────────────────────────────────────────
+(function(){
   const pages=document.getElementById('pages');
-  let sx=null,sy=null,lock=null;
+  let sx=null, sy=null, lock=null;
   pages.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;lock=null;},{passive:true});
   pages.addEventListener('touchmove',e=>{
-    if(!sx)return;
-    const dx=e.touches[0].clientX-sx,dy=e.touches[0].clientY-sy;
+    if(sx===null) return;
+    const dx=e.touches[0].clientX-sx, dy=e.touches[0].clientY-sy;
     if(!lock&&(Math.abs(dx)>8||Math.abs(dy)>8)) lock=Math.abs(dx)>Math.abs(dy)?'h':'v';
     if(lock==='h') e.preventDefault();
   },{passive:false});
   pages.addEventListener('touchend',e=>{
-    if(lock!=='h'||!sx){sx=null;return;}
+    if(lock!=='h'||sx===null){sx=null;return;}
     const dx=e.changedTouches[0].clientX-sx;
-    if(Math.abs(dx)>50){
-      if(dx<0) currentTab=Math.min(TABS.length-1,currentTab+1);
-      else currentTab=Math.max(0,currentTab-1);
-      switchTab(currentTab);
-    }
-    sx=null;lock=null;
+    if(Math.abs(dx)>50) goTab(dx<0?Math.min(TABS.length-1,TAB+1):Math.max(0,TAB-1));
+    sx=null; lock=null;
   },{passive:true});
-}
+})();
 
-// ── Init ─────────────────────────────────────────
-render();
+// ── Init ──────────────────────────────────────────
+fullRender();
 </script>
 </body>
 </html>
